@@ -192,6 +192,31 @@ body {
   .lang-selector-wrapper {
     align-self: center;
   }
+
+  .app-container {
+    padding: 16px 12px;
+    gap: 16px;
+  }
+
+  .card {
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+
+  .tab-btn {
+    flex: 1 1 calc(50% - 6px);
+    font-size: 0.8rem;
+    padding: 8px 10px;
+  }
+
+  .tab-contents {
+    padding: 16px 12px;
+  }
+
+  .accordion-body {
+    padding: 0 14px 14px 14px;
+    padding-top: 14px;
+  }
 }
 
 .header-logo {
@@ -242,9 +267,8 @@ body {
 @media (max-width: 1024px) {
   .app-workspace {
     grid-template-columns: 1fr;
-    /* QR preview shows first on mobile */
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
   }
 
   /* Force the preview panel first visually */
@@ -254,6 +278,20 @@ body {
 
   .sticky-preview {
     position: static;
+  }
+
+  .app-container {
+    padding: 24px 16px;
+    gap: 24px;
+  }
+
+  .card {
+    padding: 24px;
+    border-radius: 20px;
+  }
+
+  .controls-panel {
+    gap: 24px;
   }
 }
 
@@ -1097,6 +1135,7 @@ input[type="color"]::-webkit-color-swatch {
 /* 10. Right Panel: Preview Layout */
 .preview-panel {
   position: relative;
+  align-self: stretch;
 }
 
 .sticky-preview {
@@ -1346,8 +1385,8 @@ input[type="color"]::-webkit-color-swatch {
   display: none;
   /* hidden on desktop */
   position: fixed;
-  bottom: 28px;
-  right: 20px;
+  bottom: max(28px, calc(16px + env(safe-area-inset-bottom)));
+  right: max(20px, calc(16px + env(safe-area-inset-right)));
   flex-direction: column;
   gap: 12px;
   z-index: 200;

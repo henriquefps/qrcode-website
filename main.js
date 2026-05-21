@@ -126,6 +126,7 @@ const TRANSLATIONS = {
     scannerTipText: "Point your smartphone camera to test the scan in real-time.",
     btnDownloadPng: "Download PNG",
     btnDownloadSvg: "Download SVG (Vector)",
+    btnScanQr: "Scan & Import QR",
     btnCopyContent: "Copy current content to clipboard",
     footerCredit: '© 2026 QRGo. Developed by <strong>Henrique Silva</strong>. Check out my website at <a href="https://hfps.dev" target="_blank" class="footer-link">hfps.dev</a>.',
     techStackInfo: "Powered by Vite • Vanilla CSS • qr-code-styling",
@@ -258,6 +259,7 @@ const TRANSLATIONS = {
     scannerTipText: "Aponte a câmara do telemóvel para testar a leitura em tempo real.",
     btnDownloadPng: "Descarregar PNG",
     btnDownloadSvg: "Descarregar SVG (Vetor)",
+    btnScanQr: "Escanear e Importar QR",
     btnCopyContent: "Copiar conteúdo atual",
     footerCredit: '© 2026 QRGo. Desenvolvido por <strong>Henrique Silva</strong>. Conheça o meu website em <a href="https://hfps.dev" target="_blank" class="footer-link">hfps.dev</a>.',
     techStackInfo: "Desenvolvido com Vite • Vanilla CSS • qr-code-styling",
@@ -390,6 +392,7 @@ const TRANSLATIONS = {
     scannerTipText: "Apunte la cámara de su móvil para probar el escaneo en tiempo real.",
     btnDownloadPng: "Descargar PNG",
     btnDownloadSvg: "Descargar SVG (Vector)",
+    btnScanQr: "Escanear e Importar QR",
     btnCopyContent: "Copiar contenido actual",
     footerCredit: '© 2026 QRGo. Desarrollado por <strong>Henrique Silva</strong>. Visite mi sitio web en <a href="https://hfps.dev" target="_blank" class="footer-link">hfps.dev</a>.',
     techStackInfo: "Desarrollado con Vite • Vanilla CSS • qr-code-styling",
@@ -1287,6 +1290,14 @@ function setupMobileFABs() {
   const fabScan = document.getElementById('btn-fab-scan');
   if (fabScan) {
     fabScan.addEventListener('click', () => {
+      openScannerModal();
+    });
+  }
+
+  // Desktop/Sidebar Scan button opens the scanner modal
+  const btnScan = document.getElementById('btn-scan-qr');
+  if (btnScan) {
+    btnScan.addEventListener('click', () => {
       openScannerModal();
     });
   }
