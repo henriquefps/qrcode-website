@@ -37,18 +37,18 @@ const TRANSLATIONS = {
     labelEmailTo: "To Email Address",
     placeholderEmailTo: "hello@company.com",
     labelEmailSub: "Subject",
-    placeholderEmailSub: "Inquiry about QRGo",
+    placeholderEmailSub: "Subject Email",
     labelEmailBody: "Email Body",
-    placeholderEmailBody: "Hello Henrique, I saw your awesome AI styled QR Code tool...",
+    placeholderEmailBody: "Hello, I am interested in custom styled QR Codes...",
     labelSmsPhone: "Phone / Mobile Number",
     placeholderSmsPhone: "+1234567890",
     labelSmsBody: "SMS Body Message (Optional)",
     placeholderSmsBody: "Hi! Let's connect about the AI Developer role.",
     tipSms: "Scanning will launch the SMS app with this message prefilled.",
     labelFirst: "First Name",
-    placeholderFirst: "Henrique",
+    placeholderFirst: "Jane",
     labelLast: "Last Name",
-    placeholderLast: "Silva",
+    placeholderLast: "Doe",
     labelCompany: "Company",
     placeholderCompany: "My Company",
     labelTitle: "Job Title",
@@ -58,7 +58,7 @@ const TRANSLATIONS = {
     labelEmail: "Work Email",
     placeholderEmail: "email@company.com",
     labelVcardUrl: "Website URL",
-    placeholderVcardUrl: "https://hfps.dev",
+    placeholderVcardUrl: "https://example.com",
     stylingHeader: "Styling & Customization",
     btnExportStyle: "Export Style Config",
     btnImportStyle: "Import Style Config",
@@ -170,18 +170,18 @@ const TRANSLATIONS = {
     labelEmailTo: "Endereço de E-mail de Destino",
     placeholderEmailTo: "ola@empresa.com",
     labelEmailSub: "Assunto",
-    placeholderEmailSub: "Contacto sobre QRGo",
+    placeholderEmailSub: "Assunto do email",
     labelEmailBody: "Corpo do E-mail",
-    placeholderEmailBody: "Olá Henrique, vi a sua incrível ferramenta de QR Codes personalizados com IA...",
+    placeholderEmailBody: "Olá, tenho interesse em QR Codes personalizados...",
     labelSmsPhone: "Número de Telefone / Telemóvel",
     placeholderSmsPhone: "+351912345678",
     labelSmsBody: "Mensagem do SMS (Opcional)",
     placeholderSmsBody: "Olá! Gostaria de falar sobre a vaga de Programador de IA.",
     tipSms: "O escaneamento abrirá a aplicação de SMS com esta mensagem preenchida.",
     labelFirst: "Primeiro Nome",
-    placeholderFirst: "Henrique",
+    placeholderFirst: "Maria",
     labelLast: "Último Nome / Apelido",
-    placeholderLast: "Silva",
+    placeholderLast: "Santos",
     labelCompany: "Empresa",
     placeholderCompany: "Minha Empresa",
     labelTitle: "Cargo / Função",
@@ -191,7 +191,7 @@ const TRANSLATIONS = {
     labelEmail: "E-mail de Trabalho",
     placeholderEmail: "email@empresa.com",
     labelVcardUrl: "URL do Website",
-    placeholderVcardUrl: "https://hfps.dev",
+    placeholderVcardUrl: "https://exemplo.com",
     stylingHeader: "Estilização & Personalização",
     btnExportStyle: "Exportar Config de Estilo",
     btnImportStyle: "Importar Config de Estilo",
@@ -303,18 +303,18 @@ const TRANSLATIONS = {
     labelEmailTo: "Dirección de Correo Destino",
     placeholderEmailTo: "hola@empresa.com",
     labelEmailSub: "Asunto",
-    placeholderEmailSub: "Contacto sobre QRGo",
+    placeholderEmailSub: "Asunto Email",
     labelEmailBody: "Cuerpo del Correo",
-    placeholderEmailBody: "Hola Henrique, vi tu increíble herramienta de códigos QR personalizados con IA...",
+    placeholderEmailBody: "Hola, me interesan los códigos QR personalizados...",
     labelSmsPhone: "Número de Teléfono / Móvil",
     placeholderSmsPhone: "+34612345678",
     labelSmsBody: "Mensaje de SMS (Opcional)",
     placeholderSmsBody: "¡Hola! Me gustaría hablar sobre la vacante de Desarrollador de IA.",
     tipSms: "El escaneo abrirá la aplicación de SMS con este mensaje precompletado.",
     labelFirst: "Nombre",
-    placeholderFirst: "Henrique",
+    placeholderFirst: "Juan",
     labelLast: "Apellido",
-    placeholderLast: "Silva",
+    placeholderLast: "Pérez",
     labelCompany: "Empresa",
     placeholderCompany: "Mi Empresa",
     labelTitle: "Cargo / Puesto",
@@ -324,7 +324,7 @@ const TRANSLATIONS = {
     labelEmail: "Correo de Trabajo",
     placeholderEmail: "correo@empresa.com",
     labelVcardUrl: "URL del Sitio Web",
-    placeholderVcardUrl: "https://hfps.dev",
+    placeholderVcardUrl: "https://ejemplo.com",
     stylingHeader: "Estilización y Personalización",
     btnExportStyle: "Exportar Config de Estilo",
     btnImportStyle: "Importar Config de Estilo",
@@ -424,7 +424,7 @@ function initLanguage() {
   } else {
     const browserLang = navigator.language || navigator.userLanguage || 'en';
     const parsedLang = browserLang.substring(0, 2).toLowerCase();
-    
+
     if (['en', 'pt', 'es'].includes(parsedLang)) {
       applyLanguage(parsedLang);
     } else {
@@ -445,7 +445,7 @@ function initLanguage() {
 
 function applyLanguage(lang) {
   currentLang = lang;
-  
+
   const i18nElements = document.querySelectorAll('[data-i18n]');
   i18nElements.forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -468,16 +468,16 @@ function applyLanguage(lang) {
 
   const pageTitle = TRANSLATIONS[lang]['seoTitle'] || 'QRGo | Premium Custom QR Code Generator';
   const pageDesc = TRANSLATIONS[lang]['seoDesc'] || '';
-  
+
   document.title = pageTitle;
   document.documentElement.lang = lang;
-  
+
   const seoDescEl = document.getElementById('seo-description');
   if (seoDescEl) seoDescEl.setAttribute('content', pageDesc);
-  
+
   const ogTitleEl = document.getElementById('og-title');
   if (ogTitleEl) ogTitleEl.setAttribute('content', pageTitle);
-  
+
   const ogDescEl = document.getElementById('og-description');
   if (ogDescEl) ogDescEl.setAttribute('content', pageDesc);
 
@@ -488,13 +488,13 @@ function applyLanguage(lang) {
 // SVG Preset Logos (Clean high-contrast vector data URLs for professional theme)
 const PRESET_LOGOS = {
   wifi: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>`,
-  
+
   web: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%230d9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
-  
+
   whatsapp: `/whatsapp.png`,
-  
+
   email: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`,
-  
+
   github: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230f172a"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>`,
 
   instagram: `/instagram.png`
@@ -512,7 +512,27 @@ document.addEventListener('DOMContentLoaded', () => {
   setupActionListeners();
   setupMobileFABs();
   setupQRScanner();
-  
+
+  // Register Service Worker for PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => console.log('Service Worker registered successfully:', reg.scope))
+        .catch((err) => console.error('Service Worker registration failed:', err));
+    });
+  }
+
+  // Prevent iOS Safari pinch-to-zoom gestures
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  document.addEventListener('gesturestart', (e) => {
+    e.preventDefault();
+  }, { passive: false });
+
   // Render initial QR Code
   initQR();
 });
@@ -527,14 +547,14 @@ function setupTabs() {
       // Deactivate current
       document.querySelector('.tab-btn.active').classList.remove('active');
       document.querySelector('.tab-pane.active').classList.remove('active');
-      
+
       // Activate new
       tab.classList.add('active');
       const targetPane = document.getElementById(`pane-${tab.dataset.tab}`);
       targetPane.classList.add('active');
-      
+
       activeTab = tab.dataset.tab;
-      
+
       // Auto upgrade EC Level or update options depending on preset matching
       handleTabChangeDefaults();
       updateQR();
@@ -603,7 +623,7 @@ function setupColorSync() {
     radio.addEventListener('change', (e) => {
       const gradientOptions = document.getElementById('row-gradient-options');
       const secondaryColor = document.getElementById('item-dots-secondary');
-      
+
       if (e.target.value === 'gradient') {
         gradientOptions.classList.remove('hidden');
         secondaryColor.classList.remove('hidden');
@@ -677,7 +697,7 @@ function setupLogoHandlers() {
     btn.addEventListener('click', () => {
       // Remove active classes
       document.querySelector('.preset-btn.active')?.classList.remove('active');
-      
+
       // Make active
       btn.classList.add('active');
       activePreset = btn.dataset.preset;
@@ -690,13 +710,13 @@ function setupLogoHandlers() {
         logoControls.classList.add('hidden');
         dropzone.classList.remove('hidden');
       }
-      
+
       // Auto adjust Error Correction to H (high recovery) when adding a logo
       const ecSelector = document.getElementById('select-ec-level');
       if (activePreset !== 'none') {
         ecSelector.value = 'H';
       }
-      
+
       updateQR();
     });
   });
@@ -744,15 +764,15 @@ function setupLogoHandlers() {
     uploadedLogoDataUrl = null;
     uploadedLogoName = '';
     activePreset = 'none';
-    
+
     // Select the None preset button
     document.querySelector('.preset-btn.active')?.classList.remove('active');
     document.querySelector('.preset-btn[data-preset="none"]').classList.add('active');
-    
+
     logoControls.classList.add('hidden');
     dropzone.classList.remove('hidden');
     fileInput.value = '';
-    
+
     updateQR();
   });
 
@@ -772,18 +792,18 @@ function setupLogoHandlers() {
     reader.onload = (e) => {
       uploadedLogoDataUrl = e.target.result;
       activePreset = 'custom';
-      
+
       // Update UI panels
       document.querySelector('.preset-btn.active')?.classList.remove('active');
       dropzone.classList.add('hidden');
       logoControls.classList.remove('hidden');
-      
+
       logoPreview.src = uploadedLogoDataUrl;
       logoNameLbl.textContent = uploadedLogoName;
-      
+
       // Auto-set High error correction
       document.getElementById('select-ec-level').value = 'H';
-      
+
       updateQR();
     };
     reader.readAsDataURL(file);
@@ -906,7 +926,7 @@ function getQRData() {
   switch (activeTab) {
     case 'url':
       let url = document.getElementById('input-url').value.trim();
-      if (url === '') return 'https://hfps.dev';
+      if (url === '') return 'https://example.com';
       // Auto prepend https if no protocol present
       if (!/^https?:\/\//i.test(url)) {
         url = 'https://' + url;
@@ -922,7 +942,7 @@ function getQRData() {
       const pass = document.getElementById('input-wifi-pass').value;
       const type = document.getElementById('input-wifi-type').value;
       const hidden = document.getElementById('input-wifi-hidden').checked;
-      
+
       if (!ssid) {
         const defaultSsid = TRANSLATIONS[currentLang]['wifiDefaultSsid'] || 'QRGo_Guest';
         return `WIFI:S:${defaultSsid};T:WPA;P:;;`;
@@ -933,14 +953,14 @@ function getQRData() {
       const to = document.getElementById('input-email-to').value.trim();
       const sub = document.getElementById('input-email-sub').value;
       const body = document.getElementById('input-email-body').value;
-      
+
       if (!to) return 'mailto:hello@company.com';
       return `mailto:${to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
 
     case 'sms':
       const phone = document.getElementById('input-sms-phone').value.trim();
       const smsBody = document.getElementById('input-sms-body').value;
-      
+
       if (!phone) return 'SMSTO:';
       return `SMSTO:${phone}:${smsBody}`;
 
@@ -970,7 +990,7 @@ function getQRData() {
       return vcard;
 
     default:
-      return 'https://hfps.dev';
+      return 'https://example.com';
   }
 }
 
@@ -1095,7 +1115,7 @@ function importStyleConfig(config) {
     // 5. Logo / Icon state synchronization
     const dropzone = document.getElementById('logo-dropzone');
     const logoControls = document.getElementById('logo-active-controls');
-    
+
     if (config.activePreset) {
       activePreset = config.activePreset;
       document.querySelector('.preset-btn.active')?.classList.remove('active');
@@ -1106,7 +1126,7 @@ function importStyleConfig(config) {
         if (config.uploadedLogoDataUrl) {
           uploadedLogoDataUrl = config.uploadedLogoDataUrl;
           uploadedLogoName = config.uploadedLogoName || 'imported_logo.png';
-          
+
           dropzone.classList.add('hidden');
           logoControls.classList.remove('hidden');
           document.getElementById('img-logo-preview').src = uploadedLogoDataUrl;
@@ -1150,10 +1170,10 @@ function importStyleConfig(config) {
 // Initial setup of QR
 function initQR() {
   const options = getQRStylingOptions();
-  
+
   // Create object
   qrCode = new QRCodeStyling(options);
-  
+
   // Mount element
   const container = document.getElementById('canvas-container');
   container.innerHTML = '';
@@ -1165,26 +1185,26 @@ function getQRStylingOptions() {
   const data = getQRData();
   const margin = parseInt(document.getElementById('range-margin').value, 10);
   const ecLevel = document.getElementById('select-ec-level').value;
-  
+
   // Dot Style mapping
   const dotStyle = document.getElementById('select-dot-style').value;
-  
+
   // Corner styles
   const cornerOuter = document.getElementById('select-corner-outer').value;
   const cornerInner = document.getElementById('select-corner-inner').value;
-  
+
   // Colors & Gradients options
   const isGradient = document.querySelector('input[name="fg-type"]:checked').value === 'gradient';
   const primaryColor = document.getElementById('color-dots-primary').value;
   const secondaryColor = document.getElementById('color-dots-secondary').value;
   const gradientType = document.getElementById('select-gradient-type').value;
   const gradientRotation = parseInt(document.getElementById('range-gradient-rotation').value, 10);
-  
+
   // Custom Corners Colors Option
   const hasCustomCorners = document.getElementById('toggle-custom-corners').checked;
   const cornerOuterColor = document.getElementById('color-corner-outer').value;
   const cornerInnerColor = document.getElementById('color-corner-inner').value;
-  
+
   // Background configuration
   const isTransparent = document.getElementById('toggle-bg-transparent').checked;
   const bgColor = isTransparent ? 'transparent' : document.getElementById('color-bg').value;
@@ -1196,10 +1216,10 @@ function getQRStylingOptions() {
   } else if (activePreset !== 'none') {
     logo = PRESET_LOGOS[activePreset];
   }
-  
+
   const logoScale = parseFloat(document.getElementById('range-logo-size').value) / 100;
   const hasLogoBg = document.getElementById('toggle-logo-bg').checked;
-  
+
   // Structure primary option blocks
   const dotsOptions = {
     type: dotStyle
@@ -1332,7 +1352,7 @@ async function openScannerModal() {
       resultBanner.style.display = 'flex';
 
       // Stop scanner
-      html5QrScanner.stop().catch(() => {});
+      html5QrScanner.stop().catch(() => { });
 
       // Populate fields: detect if URL or plain text
       const isUrl = /^https?:\/\//i.test(decodedText) || /^www\./i.test(decodedText);
@@ -1386,7 +1406,7 @@ function closeScannerModal() {
   modal.style.display = 'none';
   document.body.style.overflow = '';
   if (html5QrScanner) {
-    html5QrScanner.stop().catch(() => {});
+    html5QrScanner.stop().catch(() => { });
     html5QrScanner = null;
   }
 }

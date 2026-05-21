@@ -321,6 +321,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  margin-top: 16px;
 }
 
 .section-title {
@@ -519,7 +520,7 @@ select {
   border-radius: 12px;
   color: var(--text-primary);
   font-family: var(--font-primary);
-  font-size: 0.9rem;
+  font-size: 16px; /* Prevents auto-zoom in iOS Safari */
   outline: none;
   transition: var(--transition-smooth);
 }
@@ -1040,6 +1041,7 @@ input[type="color"]::-webkit-color-swatch {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  max-width: 120px;
 }
 
 .logo-status-tag {
