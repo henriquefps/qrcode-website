@@ -188,6 +188,7 @@ body {
     gap: 16px;
     align-items: center;
   }
+
   .lang-selector-wrapper {
     align-self: center;
   }
@@ -227,6 +228,7 @@ body {
   margin: 0 auto;
   font-weight: 400;
   line-height: 1.6;
+  text-align: center;
 }
 
 /* 4. Responsive Grid Workspace */
@@ -244,10 +246,12 @@ body {
     display: flex;
     flex-direction: column-reverse;
   }
+
   /* Force the preview panel first visually */
   .preview-panel {
     order: -1;
   }
+
   .sticky-preview {
     position: static;
   }
@@ -1339,7 +1343,8 @@ input[type="color"]::-webkit-color-swatch {
    12. Mobile FAB (Floating Action Buttons)
    ================================================================ */
 .mobile-fab-group {
-  display: none; /* hidden on desktop */
+  display: none;
+  /* hidden on desktop */
   position: fixed;
   bottom: 28px;
   right: 20px;
@@ -1368,7 +1373,8 @@ input[type="color"]::-webkit-color-swatch {
   outline: none;
 }
 
-.mobile-fab:hover, .mobile-fab:focus {
+.mobile-fab:hover,
+.mobile-fab:focus {
   transform: scale(1.1);
   box-shadow: 0 6px 28px rgba(15, 23, 42, 0.25);
 }
@@ -1405,13 +1411,19 @@ input[type="color"]::-webkit-color-swatch {
   animation: fadeInOverlay 0.22s ease;
 }
 
-.scanner-modal-overlay[style*="display:none"], .scanner-modal-overlay[style*="display: none"] {
+.scanner-modal-overlay[style*="display:none"],
+.scanner-modal-overlay[style*="display: none"] {
   display: none !important;
 }
 
 @keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .scanner-modal-box {
@@ -1429,8 +1441,15 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 @keyframes slideUpModal {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .scanner-modal-header {
@@ -1497,10 +1516,33 @@ input[type="color"]::-webkit-color-swatch {
   z-index: 10;
 }
 
-.scan-frame-corner.tl { top: 14px; left: 14px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
-.scan-frame-corner.tr { top: 14px; right: 14px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
-.scan-frame-corner.bl { bottom: 14px; left: 14px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
-.scan-frame-corner.br { bottom: 14px; right: 14px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+.scan-frame-corner.tl {
+  top: 14px;
+  left: 14px;
+  border-width: 3px 0 0 3px;
+  border-radius: 4px 0 0 0;
+}
+
+.scan-frame-corner.tr {
+  top: 14px;
+  right: 14px;
+  border-width: 3px 3px 0 0;
+  border-radius: 0 4px 0 0;
+}
+
+.scan-frame-corner.bl {
+  bottom: 14px;
+  left: 14px;
+  border-width: 0 0 3px 3px;
+  border-radius: 0 0 0 4px;
+}
+
+.scan-frame-corner.br {
+  bottom: 14px;
+  right: 14px;
+  border-width: 0 3px 3px 0;
+  border-radius: 0 0 4px 0;
+}
 
 .scan-laser {
   position: absolute;
@@ -1516,11 +1558,28 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 @keyframes scanLaser {
-  0%   { top: 18px; opacity: 1; }
-  48%  { opacity: 1; }
-  50%  { top: calc(100% - 18px); opacity: 1; }
-  98%  { opacity: 1; }
-  100% { top: 18px; opacity: 1; }
+  0% {
+    top: 18px;
+    opacity: 1;
+  }
+
+  48% {
+    opacity: 1;
+  }
+
+  50% {
+    top: calc(100% - 18px);
+    opacity: 1;
+  }
+
+  98% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 18px;
+    opacity: 1;
+  }
 }
 
 .scanner-result-banner {

@@ -33,8 +33,8 @@
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Crect x='7' y='7' width='3' height='3'/%3E%3Crect x='14' y='7' width='3' height='3'/%3E%3Crect x='7' y='14' width='3' height='3'/%3E%3Cpath d='M14 14h3v3h-3z'/%3E%3C/svg%3E">
 
   <!-- CSS Stylesheet -->
-  <script type="module" crossorigin src="./assets/index-DNUoSyGO.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DfnR3OJ-.css">
+  <script type="module" crossorigin src="./assets/index-B0HwArmA.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BWLYIMin.css">
 </head>
 
 <body>
@@ -712,24 +712,33 @@
         <p data-i18n="footerCredit">© 2026 QRGo. Developed by <strong>Henrique Silva</strong>.
           Check out my website at <a href="https://hfps.dev" target="_blank" class="footer-link">hfps.dev</a>.</p>
         <p class="tech-stack-info" data-i18n="techStackInfo">Powered by Vite • Vanilla CSS • qr-code-styling</p>
-        <p class="tech-stack-info" style="margin-top: 4px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-          <a href="https://www.flaticon.com/free-icons/whatsapp" title="whatsapp icons" target="_blank" class="footer-link" style="font-size:0.65rem; opacity:0.7;">WhatsApp icon by Freepik — Flaticon</a>
-          <a href="https://www.flaticon.com/free-icons/instagram" title="instagram icons" target="_blank" class="footer-link" style="font-size:0.65rem; opacity:0.7;">Instagram icon by cobynecz — Flaticon</a>
+        <p class="tech-stack-info"
+          style="margin-top: 4px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+          <a href="https://www.flaticon.com/free-icons/whatsapp" title="whatsapp icons" target="_blank"
+            class="footer-link" style="font-size:0.65rem; opacity:0.7;">WhatsApp icon by Freepik — Flaticon</a>
+          <a href="https://www.flaticon.com/free-icons/instagram" title="instagram icons" target="_blank"
+            class="footer-link" style="font-size:0.65rem; opacity:0.7;">Instagram icon by cobynecz — Flaticon</a>
         </p>
       </div>
     </footer>
   </div>
 
   <!-- Camera QR Scanner Modal -->
-  <div id="scanner-modal" class="scanner-modal-overlay" role="dialog" aria-modal="true" aria-label="QR Code Scanner" style="display:none;">
+  <div id="scanner-modal" class="scanner-modal-overlay" role="dialog" aria-modal="true" aria-label="QR Code Scanner"
+    style="display:none;">
     <div class="scanner-modal-box">
       <div class="scanner-modal-header">
         <h3 data-i18n="scanModalTitle">Scan QR Code</h3>
         <button class="scanner-close-btn" id="btn-close-scanner" aria-label="Close scanner">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
       </div>
-      <p class="scanner-subtitle" data-i18n="scanModalSubtitle">Point your camera at a QR code to import its content.</p>
+      <p class="scanner-subtitle" data-i18n="scanModalSubtitle">Point your camera at a QR code to import its content.
+      </p>
       <div id="qr-scanner-viewport" class="qr-scanner-viewport">
         <div class="scan-frame-corner tl"></div>
         <div class="scan-frame-corner tr"></div>
@@ -738,27 +747,39 @@
         <div class="scan-laser"></div>
       </div>
       <div id="scanner-result-banner" class="scanner-result-banner" style="display:none;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
         <span id="scanner-result-text"></span>
       </div>
-      <p class="scanner-hint" data-i18n="scanModalHint">Content will be loaded into the URL or Text field automatically.</p>
+      <p class="scanner-hint" data-i18n="scanModalHint">Content will be loaded into the URL or Text field automatically.
+      </p>
     </div>
   </div>
 
   <!-- Mobile Floating Action Buttons -->
   <div class="mobile-fab-group" id="mobile-fab-group">
     <button class="mobile-fab mobile-fab-scan" id="btn-fab-scan" aria-label="Scan QR Code" title="Scan QR Code">
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-        <line x1="14" y1="14" x2="14" y2="14.01"/><line x1="18" y1="14" x2="18" y2="14.01"/>
-        <line x1="14" y1="18" x2="14" y2="18.01"/><line x1="18" y1="18" x2="18" y2="18.01"/>
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+        <line x1="14" y1="14" x2="14" y2="14.01" />
+        <line x1="18" y1="14" x2="18" y2="14.01" />
+        <line x1="14" y1="18" x2="14" y2="18.01" />
+        <line x1="18" y1="18" x2="18" y2="18.01" />
       </svg>
     </button>
     <button class="mobile-fab mobile-fab-qr" id="btn-fab-qr" aria-label="Scroll to QR Code" title="View QR Code">
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 6H6a2 2 0 0 0-2 2v2"/><path d="M16 6h2a2 2 0 0 1 2 2v2"/>
-        <path d="M8 18H6a2 2 0 0 1-2-2v-2"/><path d="M16 18h2a2 2 0 0 0 2-2v-2"/>
-        <rect x="9" y="9" width="6" height="6" rx="1"/>
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 6H6a2 2 0 0 0-2 2v2" />
+        <path d="M16 6h2a2 2 0 0 1 2 2v2" />
+        <path d="M8 18H6a2 2 0 0 1-2-2v-2" />
+        <path d="M16 18h2a2 2 0 0 0 2-2v-2" />
+        <rect x="9" y="9" width="6" height="6" rx="1" />
       </svg>
     </button>
   </div>
