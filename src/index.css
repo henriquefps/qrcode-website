@@ -381,6 +381,7 @@ body {
   padding: 6px;
   border-radius: 14px;
   border: 1px solid rgba(15, 23, 42, 0.04);
+  margin-top: 16px;
 }
 
 .tab-btn {
@@ -1361,6 +1362,72 @@ input[type="color"]::-webkit-color-swatch {
   width: 100%;
   border-top: 1px solid rgba(15, 23, 42, 0.05);
   padding-top: 12px;
+}
+
+/* PNG Resolution Selector styles */
+.resolution-selector {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.resolution-selector-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-left: 2px;
+}
+
+.resolution-options {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  gap: 4px;
+}
+
+.resolution-btn {
+  font-family: var(--font-primary);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.resolution-btn span:first-child {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.resolution-btn span.size-desc {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.resolution-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+}
+
+.resolution-btn.active {
+  background: #ffffff;
+  color: var(--color-violet);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 /* 11. Footer */

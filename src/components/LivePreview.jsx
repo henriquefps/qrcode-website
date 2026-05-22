@@ -13,6 +13,7 @@ export default function LivePreview({
   const containerRef = useRef(null);
   const qrCodeRef = useRef(null);
   const [activeGlow, setActiveGlow] = useState(false);
+  const [pngResolution, setPngResolution] = useState('medium');
 
   // Helper to map styleConfig to qr-code-styling options
   const getQRStylingOptions = () => {
@@ -31,6 +32,7 @@ export default function LivePreview({
       };
     } else {
       dotsOptions.color = styleConfig.dotsColor;
+      dotsOptions.gradient = null;
     }
 
     const cornersSquareOptions = {
@@ -98,12 +100,35 @@ export default function LivePreview({
   }, [qrData, styleConfig]);
 
   // Handle Downloads
-  const downloadPng = () => {
+  const downloadPng = async () => {
     if (qrCodeRef.current) {
-      qrCodeRef.current.download({
-        name: 'qrgo-custom-qrcode',
-        extension: 'png'
+      let size = 512;
+      if (pngResolution === 'small') size = 256;
+      else if (pngResolution === 'large') size = 1024;
+
+      // Update resolution temporarily for export
+      qrCodeRef.current.update({
+        width: size,
+        height: size
       });
+
+      // Allow a brief moment for canvas updating
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      try {
+        await qrCodeRef.current.download({
+          name: 'qrgo-custom-qrcode',
+          extension: 'png'
+        });
+      } catch (err) {
+        console.error("Failed to download PNG:", err);
+      } finally {
+        // Restore screen preview resolution
+        qrCodeRef.current.update({
+          width: 280,
+          height: 280
+        });
+      }
     }
   };
 
@@ -153,6 +178,37 @@ export default function LivePreview({
               <line x1="12" y1="18" x2="12.01" y2="18"></line>
             </svg>
             <p>{t.scannerTipText}</p>
+          </div>
+        </div>
+
+        {/* PNG Resolution Selector */}
+        <div className="resolution-selector select-none">
+          <span className="resolution-selector-title">{t.downloadResolutionLabel}</span>
+          <div className="resolution-options">
+            <button
+              type="button"
+              className={`resolution-btn ${pngResolution === 'small' ? 'active' : ''}`}
+              onClick={() => setPngResolution('small')}
+            >
+              <span>{t.downloadSizeSmall}</span>
+              <span className="size-desc">{t.downloadSizeSmallDesc}</span>
+            </button>
+            <button
+              type="button"
+              className={`resolution-btn ${pngResolution === 'medium' ? 'active' : ''}`}
+              onClick={() => setPngResolution('medium')}
+            >
+              <span>{t.downloadSizeMedium}</span>
+              <span className="size-desc">{t.downloadSizeMediumDesc}</span>
+            </button>
+            <button
+              type="button"
+              className={`resolution-btn ${pngResolution === 'large' ? 'active' : ''}`}
+              onClick={() => setPngResolution('large')}
+            >
+              <span>{t.downloadSizeLarge}</span>
+              <span className="size-desc">{t.downloadSizeLargeDesc}</span>
+            </button>
           </div>
         </div>
 

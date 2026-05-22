@@ -123,7 +123,7 @@ export default function StylingPanel({
         try {
           const imported = JSON.parse(event.target.result);
           onImport(imported);
-          alert(t.alertImportSuccess);
+          // alert(t.alertImportSuccess);
         } catch (err) {
           alert(t.alertInvalidFile);
         }
