@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* ==========================================================================
    QRGo Premium Design System - Professional Light Mode
    Theme: Elegant Corporate Light Theme with Premium Indigo & Slate Accents
@@ -15,6 +17,7 @@
   /* Solid clean white */
   --bg-card-hover: #ffffff;
   --border-color: rgba(15, 23, 42, 0.08);
+  --input-border-color: #cbd5e1;
   /* Sophisticated subtle border */
   --border-color-focus: #6366f1;
   /* Premium Indigo */
@@ -400,6 +403,9 @@ body {
 }
 
 .tab-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
   opacity: 0.7;
   transition: var(--transition-smooth);
 }
@@ -428,6 +434,7 @@ body {
   border-radius: 16px;
   padding: 20px;
   border: 1px solid rgba(15, 23, 42, 0.04);
+  margin-top: 16px;
 }
 
 .tab-pane {
@@ -487,7 +494,7 @@ body {
   display: flex;
   align-items: center;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--input-border-color);
   border-radius: 12px;
   transition: var(--transition-smooth);
 }
@@ -516,13 +523,18 @@ select {
   width: 100%;
   padding: 12px 14px;
   background: #ffffff;
-  /* border: 1px solid #cbd5e1; */
   border-radius: 12px;
   color: var(--text-primary);
   font-family: var(--font-primary);
-  font-size: 16px; /* Prevents auto-zoom in iOS Safari */
+  font-size: 16px;
+  /* Prevents auto-zoom in iOS Safari */
   outline: none;
   transition: var(--transition-smooth);
+  /* border: 1px solid var(--input-border-color); */
+}
+
+.input-group select {
+  border: 1px solid var(--input-border-color);
 }
 
 textarea {
@@ -592,7 +604,7 @@ select option {
   right: 0;
   bottom: 0;
   background-color: #e2e8f0;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--input-border-color);
   border-radius: 9999px;
   transition: .3s;
 }
@@ -793,7 +805,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   display: flex;
   align-items: center;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--input-border-color);
   border-radius: 12px;
   padding: 4px;
   transition: var(--transition-smooth);
@@ -820,7 +832,7 @@ input[type="color"]::-webkit-color-swatch-wrapper {
 }
 
 input[type="color"]::-webkit-color-swatch {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--input-border-color);
   border-radius: 8px;
 }
 
@@ -1106,7 +1118,7 @@ input[type="color"]::-webkit-color-swatch {
 
 .btn-secondary {
   background: #ffffff;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--input-border-color);
   color: var(--text-secondary);
 }
 
@@ -1210,7 +1222,7 @@ input[type="color"]::-webkit-color-swatch {
   width: 280px;
   height: 280px;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--input-border-color);
   border-radius: 20px;
   padding: 16px;
   display: flex;
