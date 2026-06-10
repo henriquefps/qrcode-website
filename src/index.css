@@ -8,42 +8,42 @@
 
 /* 1. Global Reset & Variables */
 :root {
-  --font-primary: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Geist', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  /* Modern Corporate Light Palette */
-  --bg-main: #f8fafc;
-  /* Very light slate */
+  /* Ethos Minimalist Palette */
+  --bg-main: #faf8ff;
   --bg-card: #ffffff;
-  /* Solid clean white */
   --bg-card-hover: #ffffff;
-  --border-color: rgba(15, 23, 42, 0.08);
-  --input-border-color: #cbd5e1;
-  /* Sophisticated subtle border */
-  --border-color-focus: #6366f1;
-  /* Premium Indigo */
+  --border-color: #c2c7cb;
+  --input-border-color: #c2c7cb;
+  --border-color-focus: #172e37;
 
-  --text-primary: #0f172a;
-  /* Slate 900 */
-  --text-secondary: #475569;
-  /* Slate 600 */
-  --text-muted: #64748b;
-  /* Slate 500 */
+  --text-primary: #131b2e;
+  --text-secondary: #42474a;
+  --text-muted: #73787b;
 
-  /* Elegant Accent Colors (Professional Indigo & Teal) */
-  --color-violet: #6366f1;
-  /* Indigo-500 */
-  --color-violet-glow: rgba(99, 102, 241, 0.15);
-  --color-cyan: #0d9488;
-  /* Teal-600 for a highly premium corporate look */
-  --color-cyan-glow: rgba(13, 148, 136, 0.15);
-  --color-emerald: #10b981;
-  --color-rose: #ef4444;
+  /* Elegant Accent Colors (Ethos Indigo & Slate) */
+  --color-violet: #172e37;
+  --color-violet-glow: rgba(23, 46, 55, 0.1);
+  --color-cyan: #505f76;
+  --color-cyan-glow: rgba(80, 95, 118, 0.1);
+  --color-emerald: #2e444e;
+  --color-rose: #ba1a1a;
 
   --gradient-neon: linear-gradient(135deg, var(--color-violet) 0%, var(--color-cyan) 100%);
   --gradient-glow: linear-gradient(135deg, var(--color-violet-glow) 0%, var(--color-cyan-glow) 100%);
 
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  /* Corner Radii */
+  --radius-sm: 4px;
+  --radius-default: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
 * {
@@ -230,6 +230,7 @@ body {
 }
 
 .logo-area h1 {
+  font-family: var(--font-display);
   font-size: 2.5rem;
   font-weight: 800;
   letter-spacing: -0.03em;
@@ -240,16 +241,18 @@ body {
 }
 
 .badge {
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 2px 8px;
-  background: rgba(99, 102, 241, 0.06);
-  border: 1px solid rgba(99, 102, 241, 0.15);
+  background: rgba(23, 46, 55, 0.06);
+  border: 1px solid rgba(23, 46, 55, 0.15);
   border-radius: 9999px;
   color: var(--color-violet);
 }
 
 .subtitle {
+  font-family: var(--font-primary);
   font-size: 1.1rem;
   color: var(--text-secondary);
   max-width: 600px;
@@ -302,15 +305,15 @@ body {
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   padding: 32px;
-  box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   transition: var(--transition-smooth);
 }
 
 .card:hover {
   border-color: rgba(15, 23, 42, 0.12);
-  box-shadow: 0 12px 45px -8px rgba(15, 23, 42, 0.07);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
 /* 5. Left Panel: Controls & Steps */
@@ -348,6 +351,7 @@ body {
 }
 
 .section-title h2 {
+  font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -496,7 +500,7 @@ body {
   align-items: center;
   background: #ffffff;
   border: 1px solid var(--input-border-color);
-  border-radius: 12px;
+  border-radius: var(--radius-default);
   transition: var(--transition-smooth);
 }
 
@@ -524,7 +528,7 @@ select {
   width: 100%;
   padding: 12px 14px;
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: var(--radius-default);
   color: var(--text-primary);
   font-family: var(--font-primary);
   font-size: 16px;
@@ -551,7 +555,7 @@ textarea:focus,
 select:focus,
 .input-wrapper:focus-within {
   border-color: var(--color-violet);
-  /* box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); */
+  box-shadow: 0 0 0 2px rgba(23, 46, 55, 0.10);
   background: #ffffff;
 }
 
@@ -840,7 +844,7 @@ input[type="color"]::-webkit-color-swatch {
 .color-text-input {
   border: none !important;
   background: transparent !important;
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem !important;
   padding: 4px 8px !important;
   text-transform: uppercase;
@@ -1091,7 +1095,7 @@ input[type="color"]::-webkit-color-swatch {
   justify-content: center;
   gap: 8px;
   padding: 12px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-default);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -1103,30 +1107,31 @@ input[type="color"]::-webkit-color-swatch {
 .btn-sm {
   padding: 8px 14px;
   font-size: 0.8rem;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
 }
 
 .btn-primary {
-  background: var(--gradient-neon);
+  background: var(--color-violet);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 12px rgba(23, 46, 55, 0.15);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3), 0 2px 8px rgba(13, 148, 136, 0.2);
+  background: #2e444e;
+  box-shadow: 0 6px 18px rgba(23, 46, 55, 0.25);
 }
 
 .btn-secondary {
   background: #ffffff;
   border: 1px solid var(--input-border-color);
-  color: var(--text-secondary);
+  color: var(--color-violet);
 }
 
 .btn-secondary:hover {
-  background: #f8fafc;
-  border-color: #94a3b8;
-  color: var(--text-primary);
+  background: #f2f3ff;
+  border-color: var(--color-violet);
+  color: var(--color-violet);
   transform: translateY(-2px);
 }
 

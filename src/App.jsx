@@ -93,13 +93,13 @@ export default function App() {
     ecLevel: 'H',
     margin: 15,
     fgType: 'single', // 'single' (solid) or 'gradient'
-    dotsColor: '#8b5cf6',
-    dotsColorSecondary: '#06b6d4',
+    dotsColor: '#172e37',
+    dotsColorSecondary: '#505f76',
     gradientType: 'linear', // 'linear' or 'radial'
     gradientRotation: 45,
     customCorners: false,
-    cornersSquareColor: '#7c3aed',
-    cornersDotColor: '#0891b2',
+    cornersSquareColor: '#172e37',
+    cornersDotColor: '#505f76',
     bgColor: '#ffffff',
     bgTransparent: false,
     logoPreset: 'none',
