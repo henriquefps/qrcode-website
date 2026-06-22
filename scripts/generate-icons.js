@@ -2,11 +2,11 @@ import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
 
-const svgPath = path.resolve('public/icon.svg');
+const svgPath = path.resolve('logo.png');
 const publicDir = path.resolve('public');
 
 async function generate() {
-  console.log('Generating PNG icons from SVG using Sharp...');
+  console.log('Generating PNG icons from logo.png using Sharp...');
   const svgBuffer = fs.readFileSync(svgPath);
 
   // 1. icon-192.png
@@ -51,6 +51,13 @@ async function generate() {
     .png()
     .toFile(path.join(publicDir, 'apple-touch-icon.png'));
   console.log('✔ Generated apple-touch-icon.png');
+
+  // 6. favicon.png (32x32 px for standard favicon)
+  await sharp(svgBuffer)
+    .resize(32, 32)
+    .png()
+    .toFile(path.join(publicDir, 'favicon.png'));
+  console.log('✔ Generated favicon.png');
 
   console.log('✨ All PWA icons generated successfully!');
 }
