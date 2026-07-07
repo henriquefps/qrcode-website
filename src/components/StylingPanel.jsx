@@ -1,36 +1,141 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import {
+  DownloadSimpleIcon,
+  EnvelopeSimpleIcon,
+  ExportIcon,
+  GithubLogoIcon,
+  GlobeSimpleIcon,
+  InstagramLogoIcon,
+  ProhibitIcon,
+  TrashIcon,
+  UploadSimpleIcon,
+  WhatsappLogoIcon,
+  WifiHighIcon
+} from '@phosphor-icons/react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { PRESET_LOGOS } from '../utils/qrHelper';
 
-export default function StylingPanel({
-  styleConfig,
-  setStyleConfig,
-  lang,
-  translations,
-  onExport,
-  onImport
-}) {
-  const t = translations[lang];
+const LOGO_PRESETS = [
+  { id: 'none', label: 'None', Icon: ProhibitIcon },
+  { id: 'wifi', label: 'WiFi', Icon: WifiHighIcon },
+  { id: 'web', label: 'Globe', Icon: GlobeSimpleIcon },
+  { id: 'whatsapp', label: 'WhatsApp', Icon: WhatsappLogoIcon },
+  { id: 'email', label: 'Email', Icon: EnvelopeSimpleIcon },
+  { id: 'github', label: 'GitHub', Icon: GithubLogoIcon },
+  { id: 'instagram', label: 'Instagram', Icon: InstagramLogoIcon }
+];
+
+function ColorField({ id, label, value, disabled, onChange }) {
+  const [draft, setDraft] = useState(value);
+
+  // Keep the text draft in sync when the color changes from outside (picker, import)
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
+
+  const handleTextChange = (text) => {
+    setDraft(text);
+    if (/^#[0-9A-F]{6}$/i.test(text)) {
+      onChange(text.toLowerCase());
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={id}>{label}</Label>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          id={id}
+          value={value}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.value)}
+          className="size-9 shrink-0 cursor-pointer border border-input bg-transparent p-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+        />
+        <Input
+          type="text"
+          value={disabled ? 'TRANSPARENT' : draft}
+          disabled={disabled}
+          onChange={(e) => handleTextChange(e.target.value)}
+          className="font-mono uppercase"
+          aria-label={`${label} hex value`}
+        />
+      </div>
+    </div>
+  );
+}
+
+function SliderField({ id, label, valueLabel, value, min, max, step, onChange }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <Label htmlFor={id}>{label}</Label>
+        <Badge variant="secondary" className="font-mono">{valueLabel}</Badge>
+      </div>
+      <Slider
+        id={id}
+        min={min}
+        max={max}
+        step={step}
+        value={[value]}
+        onValueChange={(v) => onChange(Array.isArray(v) ? v[0] : v)}
+      />
+    </div>
+  );
+}
+
+function SelectField({ id, label, value, options, onChange }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={id}>{label}</Label>
+      {/* `items` lets Base UI's SelectValue render the option label, not the raw value */}
+      <Select value={value} onValueChange={onChange} items={options}>
+        <SelectTrigger id={id} className="w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+export default function StylingPanel({ styleConfig, setStyleConfig, onExport, onImport }) {
   const fileInputRef = useRef(null);
   const importStyleRef = useRef(null);
   const [isDragActive, setIsDragActive] = useState(false);
 
-  // Helper to handle simple changes
   const handleChange = (key, value) => {
-    setStyleConfig((prev) => ({
-      ...prev,
-      [key]: value
-    }));
+    setStyleConfig((prev) => ({ ...prev, [key]: value }));
   };
 
-  // Sync color text inputs with color pickers
-  const handleColorTextChange = (key, val) => {
-    // Basic hex regex validation
-    if (/^#[0-9A-F]{6}$/i.test(val)) {
-      handleChange(key, val);
-    }
-  };
-
-  // Preset logo selection
   const handlePresetSelect = (preset) => {
     setStyleConfig((prev) => {
       const updated = { ...prev, logoPreset: preset };
@@ -40,14 +145,13 @@ export default function StylingPanel({
       } else {
         updated.logoFile = PRESET_LOGOS[preset];
         updated.logoFilename = `${preset}-logo`;
-        // Auto upgrade EC Level to H for logos
+        // Logos eat into the code's data area, so bump error correction to max
         updated.ecLevel = 'H';
       }
       return updated;
     });
   };
 
-  // File drag & drop handlers
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -61,15 +165,14 @@ export default function StylingPanel({
   const processFile = (file) => {
     if (!file) return;
 
-    // Validation
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
-      alert(t.alertInvalidImage);
+      toast.error('Please upload a valid image file (PNG, JPG, SVG).');
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      alert(t.alertFileTooLarge);
+      toast.error('The file is too large. Max size allowed is 2MB.');
       return;
     }
 
@@ -80,7 +183,7 @@ export default function StylingPanel({
         logoPreset: 'custom',
         logoFile: e.target.result,
         logoFilename: file.name,
-        ecLevel: 'H' // Auto upgrade EC Level to H for logos
+        ecLevel: 'H'
       }));
     };
     reader.readAsDataURL(file);
@@ -101,10 +204,6 @@ export default function StylingPanel({
     }
   };
 
-  const triggerBrowse = () => {
-    fileInputRef.current?.click();
-  };
-
   const clearLogo = () => {
     setStyleConfig((prev) => ({
       ...prev,
@@ -114,7 +213,6 @@ export default function StylingPanel({
     }));
   };
 
-  // Handle configuration file import
   const handleImportFile = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -123,571 +221,331 @@ export default function StylingPanel({
         try {
           const imported = JSON.parse(event.target.result);
           onImport(imported);
-          // alert(t.alertImportSuccess);
-        } catch (err) {
-          alert(t.alertInvalidFile);
+          toast.success('Style configuration imported.');
+        } catch {
+          toast.error('Invalid file format. Please upload a valid JSON config file.');
         }
       };
       reader.readAsText(file);
+      e.target.value = '';
     }
   };
 
   return (
-    <div className="section-container">
-      <div className="section-title select-none">
-        <span className="step-number">2</span>
-        <h2>{t.stylingHeader}</h2>
+    <section className="flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+          02 — Style
+        </span>
+        <span className="h-px max-w-[48px] flex-1 bg-border" />
       </div>
 
-      <div className="style-actions-row select-none">
-        <button
-          className="btn btn-secondary btn-sm"
-          onClick={onExport}
-          title="Save current colors and shapes for future use"
-          type="button"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          <span>{t.btnExportStyle}</span>
-        </button>
-
-        <button
-          className="btn btn-secondary btn-sm"
-          onClick={() => importStyleRef.current?.click()}
-          title="Load styled colors and shapes from file"
-          type="button"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          <span>{t.btnImportStyle}</span>
-        </button>
-
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="xs" onClick={onExport}>
+          <ExportIcon data-icon="inline-start" />
+          Export style
+        </Button>
+        <Button variant="outline" size="xs" onClick={() => importStyleRef.current?.click()}>
+          <DownloadSimpleIcon data-icon="inline-start" />
+          Import style
+        </Button>
         <input
           type="file"
           ref={importStyleRef}
           accept=".json"
-          style={{ display: 'none' }}
+          className="hidden"
           onChange={handleImportFile}
         />
       </div>
 
-      <div className="accordion">
-        {/* Accordion Section: Shapes & Dots */}
-        <details className="accordion-item" open>
-          <summary className="accordion-header">
-            <h3>{t.qrShapesHeader}</h3>
-            <svg className="accordion-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </summary>
-          <div className="accordion-body">
-            <div className="form-grid">
-              <div className="input-group">
-                <label htmlFor="select-dot-style">{t.dotPatternLabel}</label>
-                <select
-                  id="select-dot-style"
-                  value={styleConfig.dotsType}
-                  onChange={(e) => handleChange('dotsType', e.target.value)}
-                >
-                  <option value="rounded">{t.dotStyleRounded}</option>
-                  <option value="dots">{t.dotStyleDots}</option>
-                  <option value="classy">{t.dotStyleClassy}</option>
-                  <option value="classy-rounded">{t.dotStyleClassyRounded}</option>
-                  <option value="extra-rounded">{t.dotStyleExtraRounded}</option>
-                  <option value="square">{t.dotStyleSquare}</option>
-                </select>
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="select-ec-level">{t.ecLevelLabel}</label>
-                <select
-                  id="select-ec-level"
-                  value={styleConfig.ecLevel}
-                  onChange={(e) => handleChange('ecLevel', e.target.value)}
-                >
-                  <option value="L">{t.ecLevelL}</option>
-                  <option value="M">{t.ecLevelM}</option>
-                  <option value="Q">{t.ecLevelQ}</option>
-                  <option value="H">{t.ecLevelH}</option>
-                </select>
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="select-corner-outer">{t.cornerOuterLabel}</label>
-                <select
-                  id="select-corner-outer"
-                  value={styleConfig.cornersSquareType}
-                  onChange={(e) => handleChange('cornersSquareType', e.target.value)}
-                >
-                  <option value="extra-rounded">{t.cornerOuterExtraRounded}</option>
-                  <option value="rounded">{t.cornerOuterRounded}</option>
-                  <option value="dot">{t.cornerOuterDot}</option>
-                  <option value="square">{t.cornerOuterSquare}</option>
-                </select>
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="select-corner-inner">{t.cornerInnerLabel}</label>
-                <select
-                  id="select-corner-inner"
-                  value={styleConfig.cornersDotType}
-                  onChange={(e) => handleChange('cornersDotType', e.target.value)}
-                >
-                  <option value="rounded">{t.cornerInnerRounded}</option>
-                  <option value="dot">{t.cornerInnerDot}</option>
-                  <option value="square">{t.cornerInnerSquare}</option>
-                </select>
-              </div>
-
-              <div className="input-group col-span-2">
-                <div className="slider-label-row select-none">
-                  <label htmlFor="range-margin">{t.quietZoneLabel}</label>
-                  <span className="slider-val">{styleConfig.margin}px</span>
-                </div>
-                <input
-                  type="range"
+      <Accordion defaultValue={['shapes', 'colors', 'logo']} className="w-full">
+        <AccordionItem value="shapes">
+          <AccordionTrigger>QR Shapes &amp; Layout</AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <SelectField
+                id="select-dot-style"
+                label="Dot Pattern"
+                value={styleConfig.dotsType}
+                onChange={(v) => handleChange('dotsType', v)}
+                options={[
+                  { value: 'rounded', label: 'Rounded' },
+                  { value: 'dots', label: 'Circular Dots' },
+                  { value: 'classy', label: 'Classy' },
+                  { value: 'classy-rounded', label: 'Classy Rounded' },
+                  { value: 'extra-rounded', label: 'Extra Rounded' },
+                  { value: 'square', label: 'Classic Square' }
+                ]}
+              />
+              <SelectField
+                id="select-ec-level"
+                label="Error Correction"
+                value={styleConfig.ecLevel}
+                onChange={(v) => handleChange('ecLevel', v)}
+                options={[
+                  { value: 'L', label: 'L (7% recovery)' },
+                  { value: 'M', label: 'M (15% recovery)' },
+                  { value: 'Q', label: 'Q (25% recovery)' },
+                  { value: 'H', label: 'H (30% — best with logo)' }
+                ]}
+              />
+              <SelectField
+                id="select-corner-outer"
+                label="Corner Frame (Outer)"
+                value={styleConfig.cornersSquareType}
+                onChange={(v) => handleChange('cornersSquareType', v)}
+                options={[
+                  { value: 'extra-rounded', label: 'Extra Rounded' },
+                  { value: 'rounded', label: 'Soft Rounded' },
+                  { value: 'dot', label: 'Circular Ring' },
+                  { value: 'square', label: 'Classic Square' }
+                ]}
+              />
+              <SelectField
+                id="select-corner-inner"
+                label="Corner Core (Inner)"
+                value={styleConfig.cornersDotType}
+                onChange={(v) => handleChange('cornersDotType', v)}
+                options={[
+                  { value: 'rounded', label: 'Soft Rounded' },
+                  { value: 'dot', label: 'Circular Dot' },
+                  { value: 'square', label: 'Classic Square' }
+                ]}
+              />
+              <div className="sm:col-span-2">
+                <SliderField
                   id="range-margin"
-                  min="0"
-                  max="40"
-                  step="5"
+                  label="Quiet Zone Margin"
+                  valueLabel={`${styleConfig.margin}px`}
+                  min={0}
+                  max={40}
+                  step={5}
                   value={styleConfig.margin}
-                  onChange={(e) => handleChange('margin', parseInt(e.target.value, 10))}
+                  onChange={(v) => handleChange('margin', v)}
                 />
               </div>
             </div>
-          </div>
-        </details>
+          </AccordionContent>
+        </AccordionItem>
 
-        {/* Accordion Section: Colors & Gradients */}
-        <details className="accordion-item" open>
-          <summary className="accordion-header">
-            <h3>{t.colorsGradientsHeader}</h3>
-            <svg className="accordion-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </summary>
-          <div className="accordion-body">
-            <div className="form-grid">
-              <div className="input-group col-span-2">
-                <label>{t.fgTypeLabel}</label>
-                <div className="radio-tab-container select-none">
-                  <label className="radio-tab">
-                    <input
-                      type="radio"
-                      name="fg-type"
-                      value="single"
-                      checked={styleConfig.fgType === 'single'}
-                      onChange={() => handleChange('fgType', 'single')}
-                    />
-                    <span className="radio-tab-label">{t.fgTypeSolid}</span>
-                  </label>
-                  <label className="radio-tab">
-                    <input
-                      type="radio"
-                      name="fg-type"
-                      value="gradient"
-                      checked={styleConfig.fgType === 'gradient'}
-                      onChange={() => handleChange('fgType', 'gradient')}
-                    />
-                    <span className="radio-tab-label">{t.fgTypeGradient}</span>
-                  </label>
-                </div>
-              </div>
+        <AccordionItem value="colors">
+          <AccordionTrigger>Colors &amp; Gradients</AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-col gap-4">
+              <Tabs
+                value={styleConfig.fgType}
+                onValueChange={(v) => handleChange('fgType', v)}
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="single">Solid Color</TabsTrigger>
+                  <TabsTrigger value="gradient">Gradient</TabsTrigger>
+                </TabsList>
+              </Tabs>
 
-              <div className="color-picker-row col-span-2">
-                <div className="color-picker-item">
-                  <label htmlFor="color-dots-primary">{t.dotsColorLabel}</label>
-                  <div className="color-input-wrapper">
-                    <input
-                      type="color"
-                      id="color-dots-primary"
-                      value={styleConfig.dotsColor}
-                      onChange={(e) => handleChange('dotsColor', e.target.value)}
-                    />
-                    <input
-                      type="text"
-                      id="color-dots-primary-text"
-                      className="color-text-input"
-                      value={styleConfig.dotsColor}
-                      onChange={(e) => handleColorTextChange('dotsColor', e.target.value)}
-                      placeholder="#8b5cf6"
-                    />
-                  </div>
-                </div>
-
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <ColorField
+                  id="color-dots-primary"
+                  label="Dots Color"
+                  value={styleConfig.dotsColor}
+                  onChange={(v) => handleChange('dotsColor', v)}
+                />
                 {styleConfig.fgType === 'gradient' && (
-                  <div className="color-picker-item">
-                    <label htmlFor="color-dots-secondary">{t.dotsSecondaryLabel}</label>
-                    <div className="color-input-wrapper">
-                      <input
-                        type="color"
-                        id="color-dots-secondary"
-                        value={styleConfig.dotsColorSecondary}
-                        onChange={(e) => handleChange('dotsColorSecondary', e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        id="color-dots-secondary-text"
-                        className="color-text-input"
-                        value={styleConfig.dotsColorSecondary}
-                        onChange={(e) => handleColorTextChange('dotsColorSecondary', e.target.value)}
-                        placeholder="#06b6d4"
-                      />
-                    </div>
-                  </div>
+                  <ColorField
+                    id="color-dots-secondary"
+                    label="Dots Secondary"
+                    value={styleConfig.dotsColorSecondary}
+                    onChange={(v) => handleChange('dotsColorSecondary', v)}
+                  />
                 )}
               </div>
 
               {styleConfig.fgType === 'gradient' && (
-                <div className="input-group col-span-2">
-                  <div className="form-grid" style={{ padding: 0, border: 'none', background: 'transparent' }}>
-                    <div className="input-group">
-                      <label htmlFor="select-gradient-type">{t.gradientStyleLabel}</label>
-                      <select
-                        id="select-gradient-type"
-                        value={styleConfig.gradientType}
-                        onChange={(e) => handleChange('gradientType', e.target.value)}
-                      >
-                        <option value="linear">{t.gradientStyleLinear}</option>
-                        <option value="radial">{t.gradientStyleRadial}</option>
-                      </select>
-                    </div>
-
-                    {styleConfig.gradientType === 'linear' && (
-                      <div className="input-group">
-                        <div className="slider-label-row select-none">
-                          <label htmlFor="range-gradient-rotation">{t.gradientRotationLabel}</label>
-                          <span className="slider-val">{styleConfig.gradientRotation}°</span>
-                        </div>
-                        <input
-                          type="range"
-                          id="range-gradient-rotation"
-                          min="0"
-                          max="360"
-                          step="5"
-                          value={styleConfig.gradientRotation}
-                          onChange={(e) => handleChange('gradientRotation', parseInt(e.target.value, 10))}
-                        />
-                      </div>
-                    )}
-                  </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <SelectField
+                    id="select-gradient-type"
+                    label="Gradient Style"
+                    value={styleConfig.gradientType}
+                    onChange={(v) => handleChange('gradientType', v)}
+                    options={[
+                      { value: 'linear', label: 'Linear' },
+                      { value: 'radial', label: 'Radial' }
+                    ]}
+                  />
+                  {styleConfig.gradientType === 'linear' && (
+                    <SliderField
+                      id="range-gradient-rotation"
+                      label="Rotation"
+                      valueLabel={`${styleConfig.gradientRotation}°`}
+                      min={0}
+                      max={360}
+                      step={5}
+                      value={styleConfig.gradientRotation}
+                      onChange={(v) => handleChange('gradientRotation', v)}
+                    />
+                  )}
                 </div>
               )}
 
-              {/* Custom Colors for Corners Option */}
-              <div className="checkbox-group col-span-2 select-none" style={{ marginTop: '5px' }}>
-                <label className="toggle-switch">
-                  <input
-                    type="checkbox"
-                    id="toggle-custom-corners"
-                    checked={styleConfig.customCorners}
-                    onChange={(e) => handleChange('customCorners', e.target.checked)}
-                  />
-                  <span className="toggle-slider"></span>
-                </label>
-                <span className="checkbox-label">{t.customCornersLabel}</span>
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="toggle-custom-corners"
+                  checked={styleConfig.customCorners}
+                  onCheckedChange={(checked) => handleChange('customCorners', checked)}
+                />
+                <Label htmlFor="toggle-custom-corners">
+                  Customize corner colors separately
+                </Label>
               </div>
 
-              {/* Dynamic Corners Colors Panel */}
               {styleConfig.customCorners && (
-                <div className="color-picker-row col-span-2">
-                  <div className="color-picker-item">
-                    <label htmlFor="color-corner-outer">{t.outerFrameColorLabel}</label>
-                    <div className="color-input-wrapper">
-                      <input
-                        type="color"
-                        id="color-corner-outer"
-                        value={styleConfig.cornersSquareColor}
-                        onChange={(e) => handleChange('cornersSquareColor', e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        id="color-corner-outer-text"
-                        className="color-text-input"
-                        value={styleConfig.cornersSquareColor}
-                        onChange={(e) => handleColorTextChange('cornersSquareColor', e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="color-picker-item">
-                    <label htmlFor="color-corner-inner">{t.innerCoreColorLabel}</label>
-                    <div className="color-input-wrapper">
-                      <input
-                        type="color"
-                        id="color-corner-inner"
-                        value={styleConfig.cornersDotColor}
-                        onChange={(e) => handleChange('cornersDotColor', e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        id="color-corner-inner-text"
-                        className="color-text-input"
-                        value={styleConfig.cornersDotColor}
-                        onChange={(e) => handleColorTextChange('cornersDotColor', e.target.value)}
-                      />
-                    </div>
-                  </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <ColorField
+                    id="color-corner-outer"
+                    label="Outer Frame Color"
+                    value={styleConfig.cornersSquareColor}
+                    onChange={(v) => handleChange('cornersSquareColor', v)}
+                  />
+                  <ColorField
+                    id="color-corner-inner"
+                    label="Inner Core Color"
+                    value={styleConfig.cornersDotColor}
+                    onChange={(v) => handleChange('cornersDotColor', v)}
+                  />
                 </div>
               )}
 
-              <hr className="field-divider col-span-2" />
+              <Separator />
 
-              {/* Background Color Picker */}
-              <div className="color-picker-row col-span-2">
-                <div className="color-picker-item">
-                  <label htmlFor="color-bg">{t.bgColorLabel}</label>
-                  <div className="color-input-wrapper">
-                    <input
-                      type="color"
-                      id="color-bg"
-                      value={styleConfig.bgTransparent ? '#ffffff' : styleConfig.bgColor}
-                      disabled={styleConfig.bgTransparent}
-                      onChange={(e) => handleChange('bgColor', e.target.value)}
-                    />
-                    <input
-                      type="text"
-                      id="color-bg-text"
-                      className="color-text-input"
-                      value={styleConfig.bgTransparent ? 'TRANSPARENT' : styleConfig.bgColor}
-                      disabled={styleConfig.bgTransparent}
-                      onChange={(e) => handleColorTextChange('bgColor', e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="color-picker-item" style={{ justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-                  <label>{t.transparentBgLabel}</label>
-                  <div className="checkbox-group select-none" style={{ padding: '10px 0 0 0' }}>
-                    <label className="toggle-switch">
-                      <input
-                        type="checkbox"
-                        id="toggle-bg-transparent"
-                        checked={styleConfig.bgTransparent}
-                        onChange={(e) => handleChange('bgTransparent', e.target.checked)}
-                      />
-                      <span className="toggle-slider"></span>
-                    </label>
-                    <span className="checkbox-label">{t.transparentBgCheckboxLabel}</span>
-                  </div>
+              <div className="grid grid-cols-1 items-end gap-4 sm:grid-cols-2">
+                <ColorField
+                  id="color-bg"
+                  label="Background"
+                  value={styleConfig.bgColor}
+                  disabled={styleConfig.bgTransparent}
+                  onChange={(v) => handleChange('bgColor', v)}
+                />
+                <div className="flex items-center gap-3 pb-2.5">
+                  <Switch
+                    id="toggle-bg-transparent"
+                    checked={styleConfig.bgTransparent}
+                    onCheckedChange={(checked) => handleChange('bgTransparent', checked)}
+                  />
+                  <Label htmlFor="toggle-bg-transparent">Transparent background</Label>
                 </div>
               </div>
             </div>
-          </div>
-        </details>
+          </AccordionContent>
+        </AccordionItem>
 
-        {/* Accordion Section: Logo & Icons */}
-        <details className="accordion-item" open>
-          <summary className="accordion-header">
-            <h3>{t.logoIconHeader}</h3>
-            <svg className="accordion-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </summary>
-          <div className="accordion-body">
-            <div className="logo-custom-panel">
-              {/* Preset selection */}
-              <label className="field-label-header select-none">{t.quickPresetsLabel}</label>
-              <div className="presets-grid select-none">
-                <button
-                  type="button"
-                  className={`preset-btn ${styleConfig.logoPreset === 'none' ? 'active' : ''}`}
-                  onClick={() => handlePresetSelect('none')}
-                  title="No Logo"
-                >
-                  <span className="preset-icon-wrapper block-icon">Ø</span>
-                  <span className="preset-title">{t.presetNone}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`preset-btn ${styleConfig.logoPreset === 'wifi' ? 'active' : ''}`}
-                  onClick={() => handlePresetSelect('wifi')}
-                  title="WiFi Connect"
-                >
-                  <svg className="preset-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-                    <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-                    <line x1="12" y1="20" x2="12.01" y2="20"></line>
-                  </svg>
-                  <span className="preset-title">{t.presetWifi}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`preset-btn ${styleConfig.logoPreset === 'web' ? 'active' : ''}`}
-                  onClick={() => handlePresetSelect('web')}
-                  title="Website/Globe"
-                >
-                  <svg className="preset-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="2" y1="12" x2="22" y2="12"></line>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path>
-                  </svg>
-                  <span className="preset-title">{t.presetGlobe}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`preset-btn ${styleConfig.logoPreset === 'whatsapp' ? 'active' : ''}`}
-                  onClick={() => handlePresetSelect('whatsapp')}
-                  title="WhatsApp Chat"
-                >
-                  <img className="preset-icon-img" src="/whatsapp.png" alt="WhatsApp" />
-                  <span className="preset-title">{t.presetWhatsapp}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`preset-btn ${styleConfig.logoPreset === 'email' ? 'active' : ''}`}
-                  onClick={() => handlePresetSelect('email')}
-                  title="Direct Email"
-                >
-                  <svg className="preset-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
-                  </svg>
-                  <span className="preset-title">{t.presetEmail}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`preset-btn ${styleConfig.logoPreset === 'github' ? 'active' : ''}`}
-                  onClick={() => handlePresetSelect('github')}
-                  title="GitHub Account"
-                >
-                  <svg className="preset-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                    fill="currentColor">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                  </svg>
-                  <span className="preset-title">{t.presetGithub}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`preset-btn ${styleConfig.logoPreset === 'instagram' ? 'active' : ''}`}
-                  onClick={() => handlePresetSelect('instagram')}
-                  title="Instagram Profile"
-                >
-                  <img className="preset-icon-img" src="/instagram.png" alt="Instagram" />
-                  <span className="preset-title">{t.presetInstagram}</span>
-                </button>
+        <AccordionItem value="logo">
+          <AccordionTrigger>Logo &amp; Custom Icon</AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-7">
+                {LOGO_PRESETS.map(({ id, label, Icon }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    title={label}
+                    onClick={() => handlePresetSelect(id)}
+                    className={cn(
+                      'flex min-w-0 flex-col items-center gap-1.5 border p-2 text-[0.65rem] font-semibold transition-colors',
+                      styleConfig.logoPreset === id
+                        ? 'border-primary bg-muted text-foreground'
+                        : 'border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    <Icon className="size-4.5 shrink-0" aria-hidden="true" />
+                    <span className="w-full truncate">{label}</span>
+                  </button>
+                ))}
               </div>
 
-              <div className="dropzone-divider select-none">
-                <span>{t.orUploadText}</span>
-              </div>
-
-              {/* Drop uploader */}
               {styleConfig.logoPreset !== 'custom' && !styleConfig.logoFile && (
                 <div
-                  className={`logo-dropzone ${isDragActive ? 'drag-active' : ''}`}
+                  role="button"
+                  tabIndex={0}
+                  className={cn(
+                    'flex cursor-pointer flex-col items-center gap-2 border border-dashed p-6 text-center transition-colors',
+                    isDragActive
+                      ? 'border-primary bg-muted'
+                      : 'border-border hover:border-muted-foreground'
+                  )}
                   onDragEnter={handleDrag}
                   onDragOver={handleDrag}
                   onDragLeave={handleDrag}
                   onDrop={handleDrop}
-                  onClick={triggerBrowse}
+                  onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click();
+                  }}
                 >
                   <input
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileSelect}
                     accept="image/png, image/jpeg, image/jpg, image/svg+xml"
-                    style={{ display: 'none' }}
+                    className="hidden"
                   />
-                  <div className="dropzone-content select-none">
-                    <svg className="dropzone-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-                      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                      strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="17 8 12 3 7 8"></polyline>
-                      <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                    <p className="dropzone-main-text">{t.dragDropText}</p>
-                    <p className="dropzone-sub-text">{t.supportsText}</p>
-                    <button
-                      type="button"
-                      className="btn btn-secondary btn-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        triggerBrowse();
-                      }}
-                    >
-                      {t.browseFilesBtn}
-                    </button>
-                  </div>
+                  <UploadSimpleIcon className="size-6 text-muted-foreground" aria-hidden="true" />
+                  <p className="text-sm font-medium">Drag &amp; drop your own logo here</p>
+                  <p className="text-xs text-muted-foreground">SVG, PNG or JPG · max 2MB</p>
                 </div>
               )}
 
-              {/* Logo status and controls */}
               {styleConfig.logoFile && (
-                <div className="logo-controls-panel">
-                  <div className="logo-status-row">
-                    <div className="logo-preview-badge">
-                      <img id="img-logo-preview" src={styleConfig.logoFile} alt="Uploaded Logo Preview" />
-                    </div>
-                    <div className="logo-info">
-                      <span className="logo-filename">{styleConfig.logoFilename || 'logo.png'}</span>
-                      <span className="logo-status-tag">{t.logoActiveTag}</span>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn-clear-logo"
-                      onClick={clearLogo}
-                      title="Remove logo"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div className="form-grid" style={{ marginTop: '10px', padding: 0, background: 'transparent', border: 'none' }}>
-                    <div className="input-group col-span-2" style={{ paddingBottom: 0 }}>
-                      <div className="slider-label-row select-none">
-                        <label htmlFor="range-logo-size">{t.logoScaleLabel}</label>
-                        <span className="slider-val">{Math.round(styleConfig.logoScale * 100)}%</span>
-                      </div>
-                      <input
-                        type="range"
-                        id="range-logo-size"
-                        min="5"
-                        max="45"
-                        step="5"
-                        value={Math.round(styleConfig.logoScale * 100)}
-                        onChange={(e) => handleChange('logoScale', parseInt(e.target.value, 10) / 100)}
+                <div className="flex flex-col gap-4 border p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center border bg-background p-1">
+                      <img
+                        src={styleConfig.logoFile}
+                        alt="Logo preview"
+                        className="max-h-full max-w-full object-contain"
                       />
                     </div>
-
-                    <div className="checkbox-group col-span-2 select-none">
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          id="toggle-logo-bg"
-                          checked={styleConfig.logoMargin}
-                          onChange={(e) => handleChange('logoMargin', e.target.checked)}
-                        />
-                        <span className="toggle-slider"></span>
-                      </label>
-                      <span className="checkbox-label">{t.logoMarginLabel}</span>
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <span className="truncate text-sm font-medium">
+                        {styleConfig.logoFilename || 'logo.png'}
+                      </span>
+                      <Badge variant="secondary" className="w-fit">Active</Badge>
                     </div>
+                    <Button
+                      variant="destructive"
+                      size="icon-sm"
+                      onClick={clearLogo}
+                      aria-label="Remove logo"
+                    >
+                      <TrashIcon />
+                    </Button>
+                  </div>
+
+                  <SliderField
+                    id="range-logo-size"
+                    label="Logo Scale"
+                    valueLabel={`${Math.round(styleConfig.logoScale * 100)}%`}
+                    min={5}
+                    max={45}
+                    step={5}
+                    value={Math.round(styleConfig.logoScale * 100)}
+                    onChange={(v) => handleChange('logoScale', v / 100)}
+                  />
+
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      id="toggle-logo-bg"
+                      checked={styleConfig.logoMargin}
+                      onCheckedChange={(checked) => handleChange('logoMargin', checked)}
+                    />
+                    <Label htmlFor="toggle-logo-bg">
+                      Protective margin behind logo
+                    </Label>
                   </div>
                 </div>
               )}
             </div>
-          </div>
-        </details>
-      </div>
-    </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </section>
   );
 }

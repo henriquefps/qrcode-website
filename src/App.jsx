@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ContentTypeTabs from './components/ContentTypeTabs';
 import StylingPanel from './components/StylingPanel';
 import LivePreview from './components/LivePreview';
-import ScannerModal from './components/ScannerModal';
 import MobileFABs from './components/MobileFABs';
 
-// Inputs
+// html5-qrcode is heavy — only load the scanner when the user opens it
+const ScannerModal = lazy(() => import('./components/ScannerModal'));
+
 import UrlInput from './components/inputs/UrlInput';
 import TextInput from './components/inputs/TextInput';
 import WifiInput from './components/inputs/WifiInput';
@@ -15,48 +20,13 @@ import EmailInput from './components/inputs/EmailInput';
 import SmsInput from './components/inputs/SmsInput';
 import VcardInput from './components/inputs/VcardInput';
 
-// Utils
-import { TRANSLATIONS } from './utils/translations';
+import { useTheme } from './hooks/useTheme';
 import { getQRDataString, PRESET_LOGOS } from './utils/qrHelper';
 
 export default function App() {
-  // 1. Language State Setup
-  const [lang, setLang] = useState(() => {
-    const storedLang = localStorage.getItem('qrgo_lang');
-    if (storedLang && ['en', 'pt', 'es'].includes(storedLang)) {
-      return storedLang;
-    }
-    const browserLang = navigator.language || navigator.userLanguage || 'en';
-    const parsedLang = browserLang.substring(0, 2).toLowerCase();
-    if (['en', 'pt', 'es'].includes(parsedLang)) {
-      return parsedLang;
-    }
-    return 'en';
-  });
-
-  // Sync lang changes to LocalStorage & SEO properties
-  useEffect(() => {
-    localStorage.setItem('qrgo_lang', lang);
-    const pageTitle = TRANSLATIONS[lang]['seoTitle'] || 'QRGo | Premium Custom QR Code Generator';
-    const pageDesc = TRANSLATIONS[lang]['seoDesc'] || '';
-
-    document.title = pageTitle;
-    document.documentElement.lang = lang;
-
-    const seoDescEl = document.getElementById('seo-description');
-    if (seoDescEl) seoDescEl.setAttribute('content', pageDesc);
-
-    const ogTitleEl = document.getElementById('og-title');
-    if (ogTitleEl) ogTitleEl.setAttribute('content', pageTitle);
-
-    const ogDescEl = document.getElementById('og-description');
-    if (ogDescEl) ogDescEl.setAttribute('content', pageDesc);
-  }, [lang]);
-
-  // 2. Active Content Type Tab State
+  const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('url');
 
-  // 3. Form Input Values State
   const [formValues, setFormValues] = useState({
     url: '',
     text: '',
@@ -79,13 +49,9 @@ export default function App() {
   });
 
   const handleFormChange = (key, value) => {
-    setFormValues((prev) => ({
-      ...prev,
-      [key]: value
-    }));
+    setFormValues((prev) => ({ ...prev, [key]: value }));
   };
 
-  // 4. Styling Config State
   const [styleConfig, setStyleConfig] = useState({
     dotsType: 'rounded',
     cornersSquareType: 'extra-rounded',
@@ -109,7 +75,7 @@ export default function App() {
     logoMargin: true
   });
 
-  // Smart suggestions when active content tab changes
+  // Suggest a matching preset logo when the content type changes
   useEffect(() => {
     if (activeTab === 'wifi') {
       if (styleConfig.logoPreset === 'none') {
@@ -144,35 +110,27 @@ export default function App() {
     }
   }, [activeTab]);
 
-  // 5. Scanner Modal State
   const [isScannerOpen, setIsScannerOpen] = useState(false);
 
-  // Success handler for scanning QR codes
   const handleScanSuccess = (decodedText) => {
     const isUrl = /^https?:\/\//i.test(decodedText) || /^www\./i.test(decodedText);
     if (isUrl) {
       setActiveTab('url');
-      const cleanUrl = decodedText.replace(/^https?:\/\//i, '');
-      handleFormChange('url', cleanUrl);
+      handleFormChange('url', decodedText.replace(/^https?:\/\//i, ''));
     } else {
       setActiveTab('text');
       handleFormChange('text', decodedText);
     }
   };
 
-  // Copy content to clipboard
   const handleCopyContent = () => {
-    const dataString = getQRDataString(activeTab, formValues, TRANSLATIONS, lang);
-    navigator.clipboard.writeText(dataString)
-      .then(() => {
-        alert(TRANSLATIONS[lang]['alertCopySuccess'] || 'Copied successfully!');
-      })
-      .catch((err) => {
-        alert((TRANSLATIONS[lang]['alertCopyFail'] || 'Failed to copy text: ') + err);
-      });
+    const dataString = getQRDataString(activeTab, formValues);
+    navigator.clipboard
+      .writeText(dataString)
+      .then(() => toast.success('Content copied to clipboard.'))
+      .catch((err) => toast.error(`Failed to copy text: ${err}`));
   };
 
-  // Export styling JSON config
   const handleExportStyle = () => {
     const config = {
       dotStyle: styleConfig.dotsType,
@@ -197,16 +155,16 @@ export default function App() {
       uploadedLogoName: styleConfig.logoPreset === 'custom' ? styleConfig.logoFilename : ''
     };
 
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config, null, 2));
+    const dataStr =
+      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, 2));
     const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", "qrgo_style_config.json");
+    downloadAnchor.setAttribute('href', dataStr);
+    downloadAnchor.setAttribute('download', 'qrgo_style_config.json');
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
   };
 
-  // Import styling JSON config
   const handleImportStyle = (config) => {
     setStyleConfig({
       dotsType: config.dotStyle || 'rounded',
@@ -214,31 +172,40 @@ export default function App() {
       cornersSquareType: config.cornerOuter || 'extra-rounded',
       cornersDotType: config.cornerInner || 'rounded',
       margin: config.margin !== undefined ? config.margin : 15,
-      fgType: config.fgType === 'solid' ? 'single' : (config.fgType || 'single'),
-      dotsColor: config.primaryColor || '#8b5cf6',
-      dotsColorSecondary: config.secondaryColor || '#06b6d4',
+      fgType: config.fgType === 'solid' ? 'single' : config.fgType || 'single',
+      dotsColor: config.primaryColor || '#172e37',
+      dotsColorSecondary: config.secondaryColor || '#505f76',
       gradientType: config.gradientType || 'linear',
       gradientRotation: config.gradientRotation !== undefined ? config.gradientRotation : 45,
       customCorners: !!config.hasCustomCorners,
-      cornersSquareColor: config.cornerOuterColor || '#7c3aed',
-      cornersDotColor: config.cornerInnerColor || '#0891b2',
+      cornersSquareColor: config.cornerOuterColor || '#172e37',
+      cornersDotColor: config.cornerInnerColor || '#505f76',
       bgTransparent: !!config.isTransparent,
       bgColor: config.bgColor || '#ffffff',
       logoPreset: config.activePreset || 'none',
       logoScale: config.logoScale !== undefined ? config.logoScale / 100 : 0.2,
       logoMargin: config.hasLogoBg !== undefined ? config.hasLogoBg : true,
-      logoFile: config.activePreset === 'custom' ? config.uploadedLogoDataUrl : (config.activePreset && config.activePreset !== 'none' ? PRESET_LOGOS[config.activePreset] : ''),
-      logoFilename: config.activePreset === 'custom' ? config.uploadedLogoName : (config.activePreset !== 'none' ? `${config.activePreset}-logo` : '')
+      logoFile:
+        config.activePreset === 'custom'
+          ? config.uploadedLogoDataUrl
+          : config.activePreset && config.activePreset !== 'none'
+            ? PRESET_LOGOS[config.activePreset]
+            : '',
+      logoFilename:
+        config.activePreset === 'custom'
+          ? config.uploadedLogoName
+          : config.activePreset !== 'none'
+            ? `${config.activePreset}-logo`
+            : ''
     });
   };
 
-  // Get active form component
   const renderInputForm = () => {
     switch (activeTab) {
       case 'url':
-        return <UrlInput value={formValues.url} onChange={(val) => handleFormChange('url', val)} lang={lang} translations={TRANSLATIONS} />;
+        return <UrlInput value={formValues.url} onChange={(val) => handleFormChange('url', val)} />;
       case 'text':
-        return <TextInput value={formValues.text} onChange={(val) => handleFormChange('text', val)} lang={lang} translations={TRANSLATIONS} />;
+        return <TextInput value={formValues.text} onChange={(val) => handleFormChange('text', val)} />;
       case 'wifi':
         return (
           <WifiInput
@@ -246,9 +213,7 @@ export default function App() {
             pass={formValues.wifiPass}
             type={formValues.wifiType}
             hidden={formValues.wifiHidden}
-            onChange={(key, val) => handleFormChange(key, val)}
-            lang={lang}
-            translations={TRANSLATIONS}
+            onChange={handleFormChange}
           />
         );
       case 'email':
@@ -257,9 +222,7 @@ export default function App() {
             to={formValues.emailTo}
             sub={formValues.emailSub}
             body={formValues.emailBody}
-            onChange={(key, val) => handleFormChange(key, val)}
-            lang={lang}
-            translations={TRANSLATIONS}
+            onChange={handleFormChange}
           />
         );
       case 'sms':
@@ -267,9 +230,7 @@ export default function App() {
           <SmsInput
             phone={formValues.smsPhone}
             body={formValues.smsBody}
-            onChange={(key, val) => handleFormChange(key, val)}
-            lang={lang}
-            translations={TRANSLATIONS}
+            onChange={handleFormChange}
           />
         );
       case 'vcard':
@@ -282,9 +243,7 @@ export default function App() {
             phone={formValues.vcardPhone}
             email={formValues.vcardEmail}
             url={formValues.vcardUrl}
-            onChange={(key, val) => handleFormChange(key, val)}
-            lang={lang}
-            translations={TRANSLATIONS}
+            onChange={handleFormChange}
           />
         );
       default:
@@ -292,88 +251,64 @@ export default function App() {
     }
   };
 
-  const qrData = getQRDataString(activeTab, formValues, TRANSLATIONS, lang);
+  const qrData = getQRDataString(activeTab, formValues);
 
   return (
-    <div className="app-layout">
-      {/* Dynamic Background floating blobs */}
-      <div className="bg-blobs select-none" aria-hidden="true">
-        <div className="blob blob-1"></div>
-        <div className="blob blob-2"></div>
-      </div>
+    <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col gap-8 px-4 py-8 md:py-12">
+      <Header theme={theme} onToggleTheme={toggleTheme} />
 
-      <div className="app-container">
-        {/* Header with language selector */}
-        <Header lang={lang} setLang={setLang} translations={TRANSLATIONS} />
-
-        {/* Two column grid layout */}
-        <main className="app-workspace">
-          <section className="designer-panel">
-            <div className="designer-card card">
-              {/* Step 1: Content Type tabs */}
-              <div className="section-title select-none">
-                <span className="step-number">1</span>
-                <h2>{TRANSLATIONS[lang]['step1Title']}</h2>
+      <main className="grid items-start gap-6 lg:grid-cols-[1.25fr_1fr]">
+        <Card className="order-2 lg:order-1">
+          <CardContent className="flex flex-col gap-6">
+            <section className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                  01 — Content
+                </span>
+                <span className="h-px max-w-[48px] flex-1 bg-border" />
               </div>
 
-              <ContentTypeTabs
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                lang={lang}
-                translations={TRANSLATIONS}
-              />
+              <ContentTypeTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-              {/* Dynamic input form pane */}
-              <div className="tab-contents">
-                <div className="tab-pane active">
-                  {renderInputForm()}
-                </div>
-              </div>
+              {renderInputForm()}
+            </section>
 
-              <hr className="panel-divider select-none" />
+            <Separator />
 
-              {/* Step 2: Styling panel */}
-              <StylingPanel
-                styleConfig={styleConfig}
-                setStyleConfig={setStyleConfig}
-                lang={lang}
-                translations={TRANSLATIONS}
-                onExport={handleExportStyle}
-                onImport={handleImportStyle}
-              />
-            </div>
-          </section>
+            <StylingPanel
+              styleConfig={styleConfig}
+              setStyleConfig={setStyleConfig}
+              onExport={handleExportStyle}
+              onImport={handleImportStyle}
+            />
+          </CardContent>
+        </Card>
 
-          {/* Right Column: Canvas Live Preview & Export */}
+        <div className="order-1 lg:order-2">
           <LivePreview
             qrData={qrData}
             styleConfig={styleConfig}
-            lang={lang}
-            translations={TRANSLATIONS}
             onScanClick={() => setIsScannerOpen(true)}
             onCopyClick={handleCopyContent}
           />
-        </main>
+        </div>
+      </main>
 
-        {/* Footer */}
-        <Footer lang={lang} translations={TRANSLATIONS} />
-      </div>
+      <Footer />
 
-      {/* Camera QR Scanner Modal */}
-      <ScannerModal
-        isOpen={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        onScanSuccess={handleScanSuccess}
-        lang={lang}
-        translations={TRANSLATIONS}
-      />
+      {isScannerOpen && (
+        <Suspense fallback={null}>
+          <ScannerModal
+            isOpen={isScannerOpen}
+            onClose={() => setIsScannerOpen(false)}
+            onScanSuccess={handleScanSuccess}
+          />
+        </Suspense>
+      )}
 
-      {/* Mobile Floating Action Buttons */}
-      <MobileFABs
-        onScanClick={() => setIsScannerOpen(true)}
-        lang={lang}
-        translations={TRANSLATIONS}
-      />
+      <MobileFABs onScanClick={() => setIsScannerOpen(true)} />
+
+      <Toaster position="bottom-center" theme={theme} />
     </div>
   );
 }

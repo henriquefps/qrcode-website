@@ -1,54 +1,31 @@
 import React from 'react';
+import { QrCodeIcon, ScanIcon } from '@phosphor-icons/react';
+import { Button } from '@/components/ui/button';
 
-export default function MobileFABs({ onScanClick, lang, translations }) {
-  const t = translations[lang];
-
+export default function MobileFABs({ onScanClick }) {
   const handleScrollToQR = () => {
-    const previewPanel = document.querySelector('.preview-panel');
-    if (previewPanel) {
-      previewPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    document.getElementById('live-preview')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
-    <div className="mobile-fab-group select-none" id="mobile-fab-group">
-      <button
-        className="mobile-fab mobile-fab-scan"
-        id="btn-fab-scan"
+    <div className="fixed right-4 bottom-4 z-40 flex flex-col gap-2 pb-[env(safe-area-inset-bottom)] lg:hidden">
+      <Button
+        variant="outline"
+        size="icon-lg"
         onClick={onScanClick}
-        aria-label="Scan QR Code"
-        title={t.scanModalTitle || 'Scan QR Code'}
-        type="button"
+        aria-label="Scan QR code"
+        className="bg-card shadow-lg"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="3" width="7" height="7" />
-          <rect x="14" y="3" width="7" height="7" />
-          <rect x="3" y="14" width="7" height="7" />
-          <line x1="14" y1="14" x2="14" y2="14.01" />
-          <line x1="18" y1="14" x2="18" y2="14.01" />
-          <line x1="14" y1="18" x2="14" y2="18.01" />
-          <line x1="18" y1="18" x2="18" y2="18.01" />
-        </svg>
-      </button>
-
-      <button
-        className="mobile-fab mobile-fab-qr"
-        id="btn-fab-qr"
+        <ScanIcon className="size-5" />
+      </Button>
+      <Button
+        size="icon-lg"
         onClick={handleScrollToQR}
-        aria-label="Scroll to QR Code"
-        title="View QR Code"
-        type="button"
+        aria-label="Scroll to QR code preview"
+        className="shadow-lg"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M8 6H6a2 2 0 0 0-2 2v2" />
-          <path d="M16 6h2a2 2 0 0 1 2 2v2" />
-          <path d="M8 18H6a2 2 0 0 1-2-2v-2" />
-          <path d="M16 18h2a2 2 0 0 0 2-2v-2" />
-          <rect x="9" y="9" width="6" height="6" rx="1" />
-        </svg>
-      </button>
+        <QrCodeIcon className="size-5" />
+      </Button>
     </div>
   );
 }

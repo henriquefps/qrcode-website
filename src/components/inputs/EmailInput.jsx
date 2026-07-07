@@ -1,35 +1,37 @@
 import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
-export default function EmailInput({ to, sub, body, onChange, translations, lang }) {
-  const t = translations[lang];
+export default function EmailInput({ to, sub, body, onChange }) {
   return (
-    <div className="form-grid">
-      <div className="input-group col-span-2">
-        <label htmlFor="input-email-to">{t.labelEmailTo}</label>
-        <input
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="input-email-to">To Email Address</Label>
+        <Input
           type="email"
           id="input-email-to"
-          placeholder={t.placeholderEmailTo}
+          placeholder="hello@company.com"
           value={to}
           onChange={(e) => onChange('emailTo', e.target.value)}
         />
       </div>
-      <div className="input-group col-span-2">
-        <label htmlFor="input-email-sub">{t.labelEmailSub}</label>
-        <input
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="input-email-sub">Subject</Label>
+        <Input
           type="text"
           id="input-email-sub"
-          placeholder={t.placeholderEmailSub}
+          placeholder="Email subject"
           value={sub}
           onChange={(e) => onChange('emailSub', e.target.value)}
         />
       </div>
-      <div className="input-group col-span-2">
-        <label htmlFor="input-email-body">{t.labelEmailBody}</label>
-        <textarea
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="input-email-body">Email Body</Label>
+        <Textarea
           id="input-email-body"
-          rows="3"
-          placeholder={t.placeholderEmailBody}
+          rows={3}
+          placeholder="Hello, I am interested in custom styled QR Codes..."
           value={body}
           onChange={(e) => onChange('emailBody', e.target.value)}
         />

@@ -1,52 +1,66 @@
 import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 
-export default function WifiInput({ ssid, pass, type, hidden, onChange, translations, lang }) {
-  const t = translations[lang];
+export default function WifiInput({ ssid, pass, type, hidden, onChange }) {
   return (
-    <div className="form-grid">
-      <div className="input-group col-span-2">
-        <label htmlFor="input-wifi-ssid">{t.labelSsid}</label>
-        <input
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="flex flex-col gap-2 sm:col-span-2">
+        <Label htmlFor="input-wifi-ssid">Network SSID (Name)</Label>
+        <Input
           type="text"
           id="input-wifi-ssid"
-          placeholder={t.placeholderSsid}
+          placeholder="My Home Network"
           value={ssid}
           onChange={(e) => onChange('wifiSsid', e.target.value)}
         />
       </div>
-      <div className="input-group">
-        <label htmlFor="input-wifi-pass">{t.labelPass}</label>
-        <input
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="input-wifi-pass">Password</Label>
+        <Input
           type="password"
           id="input-wifi-pass"
-          placeholder={t.placeholderPass}
+          placeholder="••••••••"
           value={pass}
           onChange={(e) => onChange('wifiPass', e.target.value)}
         />
       </div>
-      <div className="input-group">
-        <label htmlFor="input-wifi-type">{t.labelSecurity}</label>
-        <select
-          id="input-wifi-type"
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="input-wifi-type">Security Mode</Label>
+        <Select
           value={type}
-          onChange={(e) => onChange('wifiType', e.target.value)}
+          onValueChange={(val) => onChange('wifiType', val)}
+          items={[
+            { value: 'WPA', label: 'WPA/WPA2' },
+            { value: 'WEP', label: 'WEP' },
+            { value: 'nopass', label: 'Unsecured (Open)' }
+          ]}
         >
-          <option value="WPA">{t.securityWpa}</option>
-          <option value="WEP">{t.securityWep}</option>
-          <option value="nopass">{t.securityOpen}</option>
-        </select>
+          <SelectTrigger id="input-wifi-type" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="WPA">WPA/WPA2</SelectItem>
+            <SelectItem value="WEP">WEP</SelectItem>
+            <SelectItem value="nopass">Unsecured (Open)</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      <div className="checkbox-group col-span-2">
-        <label className="toggle-switch">
-          <input
-            type="checkbox"
-            id="input-wifi-hidden"
-            checked={hidden}
-            onChange={(e) => onChange('wifiHidden', e.target.checked)}
-          />
-          <span className="toggle-slider"></span>
-        </label>
-        <span className="checkbox-label">{t.labelHidden}</span>
+      <div className="flex items-center gap-3 sm:col-span-2">
+        <Switch
+          id="input-wifi-hidden"
+          checked={hidden}
+          onCheckedChange={(checked) => onChange('wifiHidden', checked)}
+        />
+        <Label htmlFor="input-wifi-hidden">This is a hidden network SSID</Label>
       </div>
     </div>
   );

@@ -1,86 +1,46 @@
 import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-export default function VcardInput({
-  first,
-  last,
-  company,
-  title,
-  phone,
-  email,
-  url,
-  onChange,
-  translations,
-  lang
-}) {
-  const t = translations[lang];
+const FIELDS = [
+  { key: 'vcardFirst', id: 'input-vcard-first', label: 'First Name', placeholder: 'Jane', type: 'text' },
+  { key: 'vcardLast', id: 'input-vcard-last', label: 'Last Name', placeholder: 'Doe', type: 'text' },
+  { key: 'vcardCompany', id: 'input-vcard-company', label: 'Company', placeholder: 'My Company', type: 'text' },
+  { key: 'vcardTitle', id: 'input-vcard-title', label: 'Job Title', placeholder: 'Solutions Specialist', type: 'text' },
+  { key: 'vcardPhone', id: 'input-vcard-phone', label: 'Mobile Phone', placeholder: '+351 912 345 678', type: 'tel' },
+  { key: 'vcardEmail', id: 'input-vcard-email', label: 'Work Email', placeholder: 'email@company.com', type: 'email' }
+];
+
+export default function VcardInput({ first, last, company, title, phone, email, url, onChange }) {
+  const values = {
+    vcardFirst: first,
+    vcardLast: last,
+    vcardCompany: company,
+    vcardTitle: title,
+    vcardPhone: phone,
+    vcardEmail: email
+  };
+
   return (
-    <div className="form-grid">
-      <div className="input-group">
-        <label htmlFor="input-vcard-first">{t.labelFirst}</label>
-        <input
-          type="text"
-          id="input-vcard-first"
-          placeholder={t.placeholderFirst}
-          value={first}
-          onChange={(e) => onChange('vcardFirst', e.target.value)}
-        />
-      </div>
-      <div className="input-group">
-        <label htmlFor="input-vcard-last">{t.labelLast}</label>
-        <input
-          type="text"
-          id="input-vcard-last"
-          placeholder={t.placeholderLast}
-          value={last}
-          onChange={(e) => onChange('vcardLast', e.target.value)}
-        />
-      </div>
-      <div className="input-group">
-        <label htmlFor="input-vcard-company">{t.labelCompany}</label>
-        <input
-          type="text"
-          id="input-vcard-company"
-          placeholder={t.placeholderCompany}
-          value={company}
-          onChange={(e) => onChange('vcardCompany', e.target.value)}
-        />
-      </div>
-      <div className="input-group">
-        <label htmlFor="input-vcard-title">{t.labelTitle}</label>
-        <input
-          type="text"
-          id="input-vcard-title"
-          placeholder={t.placeholderTitle}
-          value={title}
-          onChange={(e) => onChange('vcardTitle', e.target.value)}
-        />
-      </div>
-      <div className="input-group">
-        <label htmlFor="input-vcard-phone">{t.labelPhone}</label>
-        <input
-          type="tel"
-          id="input-vcard-phone"
-          placeholder={t.placeholderPhone}
-          value={phone}
-          onChange={(e) => onChange('vcardPhone', e.target.value)}
-        />
-      </div>
-      <div className="input-group">
-        <label htmlFor="input-vcard-email">{t.labelEmail}</label>
-        <input
-          type="email"
-          id="input-vcard-email"
-          placeholder={t.placeholderEmail}
-          value={email}
-          onChange={(e) => onChange('vcardEmail', e.target.value)}
-        />
-      </div>
-      <div className="input-group col-span-2">
-        <label htmlFor="input-vcard-url">{t.labelVcardUrl}</label>
-        <input
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {FIELDS.map((field) => (
+        <div key={field.key} className="flex flex-col gap-2">
+          <Label htmlFor={field.id}>{field.label}</Label>
+          <Input
+            type={field.type}
+            id={field.id}
+            placeholder={field.placeholder}
+            value={values[field.key]}
+            onChange={(e) => onChange(field.key, e.target.value)}
+          />
+        </div>
+      ))}
+      <div className="flex flex-col gap-2 sm:col-span-2">
+        <Label htmlFor="input-vcard-url">Website URL</Label>
+        <Input
           type="url"
           id="input-vcard-url"
-          placeholder={t.placeholderVcardUrl}
+          placeholder="https://example.com"
           value={url}
           onChange={(e) => onChange('vcardUrl', e.target.value)}
         />

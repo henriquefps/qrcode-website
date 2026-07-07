@@ -12,47 +12,41 @@ export const PRESET_LOGOS = {
   instagram: `/instagram.png`
 };
 
-export function getQRDataString(activeTab, values, translations, currentLang) {
+export function getQRDataString(activeTab, values) {
   switch (activeTab) {
-    case 'url':
+    case 'url': {
       let url = values.url.trim();
       if (url === '') return 'https://example.com';
       if (!/^https?:\/\//i.test(url)) {
         url = 'https://' + url;
       }
       return url;
+    }
 
     case 'text':
-      return values.text || translations[currentLang]['textDefaultFallback'] || 'QRGo premium styled QR code!';
+      return values.text || 'QRGo custom styled QR code!';
 
-    case 'wifi':
-      const ssid = values.wifiSsid;
-      const pass = values.wifiPass;
-      const type = values.wifiType;
-      const hidden = values.wifiHidden;
-
+    case 'wifi': {
+      const { wifiSsid: ssid, wifiPass: pass, wifiType: type, wifiHidden: hidden } = values;
       if (!ssid) {
-        const defaultSsid = translations[currentLang]['wifiDefaultSsid'] || 'QRGo_Guest';
-        return `WIFI:S:${defaultSsid};T:WPA;P:;;`;
+        return 'WIFI:S:QRGo_Guest;T:WPA;P:;;';
       }
       return `WIFI:S:${ssid};T:${type};P:${pass};H:${hidden ? 'true' : 'false'};;`;
+    }
 
-    case 'email':
+    case 'email': {
       const to = values.emailTo.trim();
-      const sub = values.emailSub;
-      const body = values.emailBody;
-
       if (!to) return 'mailto:hello@company.com';
-      return `mailto:${to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+      return `mailto:${to}?subject=${encodeURIComponent(values.emailSub)}&body=${encodeURIComponent(values.emailBody)}`;
+    }
 
-    case 'sms':
+    case 'sms': {
       const phone = values.smsPhone.trim();
-      const smsBody = values.smsBody;
-
       if (!phone) return 'SMSTO:';
-      return `SMSTO:${phone}:${smsBody}`;
+      return `SMSTO:${phone}:${values.smsBody}`;
+    }
 
-    case 'vcard':
+    case 'vcard': {
       const first = values.vcardFirst.trim();
       const last = values.vcardLast.trim();
       const company = values.vcardCompany.trim();
@@ -62,8 +56,7 @@ export function getQRDataString(activeTab, values, translations, currentLang) {
       const website = values.vcardUrl.trim();
 
       if (!first && !last) {
-        const defaultName = translations[currentLang]['vcardDefaultName'] || 'QRGo User';
-        return `BEGIN:VCARD\nVERSION:3.0\nFN:${defaultName}\nEND:VCARD`;
+        return 'BEGIN:VCARD\nVERSION:3.0\nFN:QRGo User\nEND:VCARD';
       }
 
       let vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
@@ -76,6 +69,7 @@ export function getQRDataString(activeTab, values, translations, currentLang) {
       if (website) vcard += `URL:${website}\n`;
       vcard += 'END:VCARD';
       return vcard;
+    }
 
     default:
       return 'https://example.com';

@@ -1,13 +1,14 @@
 import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-export default function UrlInput({ value, onChange, translations, lang }) {
-  const t = translations[lang];
+export default function UrlInput({ value, onChange }) {
   return (
-    <div className="input-group">
-      <label htmlFor="input-url">{t.labelUrl}</label>
-      <div className="input-wrapper">
-        <span className="input-prefix">https://</span>
-        <input
+    <div className="flex flex-col gap-2">
+      <Label htmlFor="input-url">Website URL</Label>
+      <div className="flex items-center gap-1">
+        <span className="text-sm text-muted-foreground select-none">https://</span>
+        <Input
           type="text"
           id="input-url"
           placeholder="example.com"
@@ -15,7 +16,9 @@ export default function UrlInput({ value, onChange, translations, lang }) {
           onChange={(e) => onChange(e.target.value)}
         />
       </div>
-      <span className="input-tip">{t.tipUrl}</span>
+      <p className="text-xs text-muted-foreground">
+        Provide a fully qualified URL for scanners to redirect instantly.
+      </p>
     </div>
   );
 }
