@@ -64,25 +64,38 @@ Top-level segmented navigation **Create | Read** in the header on desktop AND mo
   **Hide/Show** (mask) toggle, plus automatic masking for Wi-Fi passwords and `otpauth://` secrets; **Scan again**.
   Parsed views (pure parsers in `lib/parse`, unit tested): Wi-Fi (`WIFI:T:;S:;P:;H:;;` with escapes) with copy-password, vCard / MeCard, `mailto:`, `smsto:`/`sms:`,
   `tel:`, `geo:`, `otpauth://` (issuer, account, secret masked), URL, plain text. Always keep a "raw text" view.
+- **Screen** source (desktop, `getDisplayMedia`): reads a code shown in another window through the same scan loop; the stream stops on a result,
+  on Stop and when sharing ends. Vibrate (`navigator.vibrate`) on a camera hit where supported.
+- **Per-type actions**: vCard/MeCard → Save contact (.vcf), `tel:` → Call, `geo:` → Open in maps / OpenStreetMap, `mailto:` → Compose email,
+  SMS → Send SMS, Wi-Fi → Copy password. `otpauth://totp` shows the current code (RFC 6238, WebCrypto) with the time left and Copy.
+- **Copy and clear**: copying a secret (Wi-Fi password, OTP secret or code, masked text) clears the clipboard after 30 s (countdown toast with Keep;
+  the clear waits for focus; Clear now if the browser refuses). This needs `Permissions-Policy: clipboard-read=(self)` in Chrome (see docs/deploy.md);
+  the app never reads the clipboard.
+- **Incoming images** (installed PWA): manifest `share_target` (POST `/share-target`, handled by the service worker; the Worker 303s to `#/read` if no
+  service worker is active yet) and `file_handlers` (`launchQueue`). The WASM fallback is prefetched while idle where there is no native detector.
 - Nothing is persisted. Clipboard writes only on user action.
 
 ## Quick show (`features/show/`)
 
 Header button opens a full-screen overlay: a textarea (paste a password/URL, autofocus, mask toggle for the input) → live **huge high-contrast QR**
 (black on white, error correction M, quiet zone, sized to the viewport minimum side, no styling), **Esc** or a close button closes and clears the text.
-Shortcut: `Q` when not typing. Nothing saved. Works offline.
+Shortcut: `Q` when not typing, and `#/show` (the manifest's Quick show shortcut). Keeps the screen on (Wake Lock), closes itself after 60 s
+(visible countdown, +60 s, pause), drops to error correction L with a density warning for long text, and has a white full-screen mode. Nothing saved. Works offline.
 
 ## Create (`features/create/`)
 
-Keep everything the old app does: content types URL / Text / Wi-Fi / Email / SMS / vCard; styling (dots, corner squares/dots, colors, gradients, logos with presets and
+Keep everything the old app does: content types URL / Text / Wi-Fi / Email / SMS / vCard, plus Phone, WhatsApp, Event (iCalendar), Location (`geo:`) and 2FA (`otpauth://`, secret generated locally); styling (dots, corner squares/dots, colors, gradients, logos with presets and
 upload, margin, error correction); style preset export/import (JSON); download PNG (256/512/1024 selector) and SVG; live preview. Migrate to TS with typed content-type definitions,
 tidy structure, and unit tests for `getQRDataString`-style builders (escaping of Wi-Fi/vCard fields) and preset validation. Layout: controls + sticky preview on desktop; stacked with the preview first on mobile.
+A **live scannability check** renders the styled code at 400 and 200 px and decodes it (badge: Scannable / May not scan / Not checked, plus hints for
+contrast, logo size and quiet zone). **Batch**: up to 1,000 rows (lines or CSV with column mapping) into a ZIP of PNG or SVG (lazy chunk, `jszip` on demand).
 
 ## Brand & PWA
 
 New Qrcode icon (`hfps-repo-assets` skill): icon.svg, icon-light.svg, icon.png, favicon.ico, apple-touch-icon, 192/512 + maskable, 2560x1280 social image, `og.png` for OG/Twitter.
 `index.html` with full SEO/OG/Twitter/JSON-LD for `https://qrcode.hfps.dev/`, `robots.txt`, `sitemap.xml`, `manifest.webmanifest`.
-PWA via `vite-plugin-pwa` (generateSW, autoUpdate), offline works; precache small (the WASM fallback and big chunks are runtime-cached). The old custom `public/sw.js` is removed.
+PWA via `vite-plugin-pwa` (**injectManifest**, autoUpdate; own service worker `src/pwa/sw.ts` with Workbox precache, runtime caches and the share-target POST
+handler; `registerSW.js` is injected deferred), offline works; precache small (the WASM fallback, `jszip` and non-Latin fonts are runtime-cached). The old custom `public/sw.js` is removed.
 About dialog: version, description, privacy statement ("nothing leaves your device"), source link, AGPL notice, third-party notices.
 
 ## Deploy (Cloudflare Worker, `cf` CLI — no Wrangler config)
@@ -90,7 +103,7 @@ About dialog: version, description, privacy statement ("nothing leaves your devi
 Same as Designer: `cloudflare.config.ts` (worker name `qrcode`, `runWorkerFirst: true`, SPA fallback, domains `qrcode.hfps.dev` and `qrgo.hfps.dev`),
 `worker/index.ts` (**only `export default`**) + `worker/routing.ts` with tests: `qrgo.hfps.dev/sw.js` → self-unregistering service worker (clears caches, redirects windows),
 any other path on qrgo → 301 to `https://qrcode.hfps.dev<path+query>`, everything else → `env.ASSETS`. `@cloudflare/vite-plugin`; scripts `deploy` / `deploy:dry` call `node node_modules/cf/bin/cf`
-(Node ≥ 22.18, never Bun). `public/_headers` (no-cache for sw/index/manifest, immutable for `/assets/*`). Document in `docs/deploy.md`. Workers only prepare + dry-run; the real deploy
+(Node ≥ 22.18, never Bun). `public/_headers` (no-cache for sw/index/manifest, immutable for `/assets/*`, plus CSP, Permissions-Policy and the other security headers). Document in `docs/deploy.md`. Workers only prepare + dry-run; the real deploy
 and domain move are done by the coordinator.
 
 ## License
@@ -99,6 +112,6 @@ AGPL-3.0-or-later: verbatim `LICENSE` from gnu.org, `package.json` `"license"`, 
 
 ## Quality bar
 
-`bun run build`, `bun run lint`, `bunx tsc -b`, `bun run test` pass. Check widths 390/1024/1440, light and dark. No text below 12px. No raw Tailwind colors in UI chrome. Accessible names on icon buttons;
+`bun run build`, `bun run lint`, `bunx tsc -b`, `bun run test` and `bun run e2e` (Playwright on the production build with the real `_headers`) pass; CI runs all of them. Check widths 390/1024/1440, light and dark. No text below 12px. No raw Tailwind colors in UI chrome. Accessible names on icon buttons;
 keyboard reachable; visible focus. After merges run `bun install` before building. Gotchas: workerd rejects non-function named exports from the Worker entry; Chromium reports `PointerEvent.detail=0`.
 Each worker finishes with a PR to `main` (`gh pr create`), with a summary and how it was verified.

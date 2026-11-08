@@ -82,12 +82,12 @@ function SliderField({ id, label, valueLabel, value, min, max, step, onChange }:
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <Label htmlFor={id}>{label}</Label>
+        <Label id={`${id}-label`}>{label}</Label>
         <Badge variant="outline" className="font-mono">
           {valueLabel}
         </Badge>
       </div>
-      <Slider id={id} min={min} max={max} step={step} value={[value]} onValueChange={(v) => onChange(v[0])} />
+      <Slider id={id} min={min} max={max} step={step} value={[value]} onValueChange={(v) => onChange(v[0])} aria-labelledby={`${id}-label`} />
     </div>
   );
 }
@@ -345,7 +345,6 @@ export function StylingPanel({ style, setStyle, onExport, onImport }: StylingPan
                 <div
                   role="button"
                   tabIndex={0}
-                  aria-label="Upload your own logo"
                   className={cn(
                     'flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed p-6 text-center outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50',
                     dragActive ? 'border-primary bg-muted' : 'border-border hover:border-muted-foreground',

@@ -13,7 +13,8 @@ src/
   pwa/               service worker (sw.ts), share target and launchQueue handoff
   lib/               pure, unit-tested helpers: qrData builders, parse (Wi-Fi, vCard, otpauth...), preset, decode
   theme/             light/dark/system + palette (localStorage: qrcode.theme, qrcode.palette)
-worker/              Worker entry (assets + qrgo.hfps.dev redirect) and routing, tested
+worker/              Worker entry (assets, qrgo.hfps.dev redirect, /share-target fallback) and routing, tested
+e2e/                 Playwright tests against the production build (fixtures generated in global-setup.ts)
 ```
 
 ## Decisions worth knowing
