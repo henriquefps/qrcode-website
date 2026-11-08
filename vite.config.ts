@@ -27,9 +27,9 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'icon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png', 'manifest.webmanifest'],
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        // og.png is only for link previews; the zxing WASM fallback (binary + its chunk) and Inter's
-        // non-Latin subsets are cached on first use (see the runtime routes in src/pwa/sw.ts) instead of precached.
-        globIgnores: ['**/og.png', '**/wasm-*.js', '**/*.wasm', '**/*-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*.woff2'],
+        // og.png is only for link previews; the zxing WASM fallback (binary + its chunk), jszip (Batch only)
+        // and Inter's non-Latin subsets are cached on first use (see the runtime routes in src/pwa/sw.ts) instead of precached.
+        globIgnores: ['**/og.png', '**/wasm-*.js', '**/*.wasm', '**/jszip-*.js', '**/*-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*.woff2'],
       },
     }),
   ],
@@ -48,6 +48,8 @@ export default defineConfig({
             { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/, priority: 30 },
             { name: 'radix', test: /node_modules[\\/](radix-ui|@radix-ui|@floating-ui|aria-hidden|react-remove-scroll[^\\/]*)[\\/]/, priority: 20 },
             { name: 'qr-styling', test: /node_modules[\\/]qr-code-styling[\\/]/, priority: 20 },
+            // Lazy (Batch dialog only); the name keeps it out of the precache (globIgnores above).
+            { name: 'jszip', test: /node_modules[\\/]jszip[\\/]/, priority: 20 },
           ],
         },
       },
