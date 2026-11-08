@@ -34,9 +34,9 @@ export function AppShell({ route, onNavigate, onQuickShow, children }: AppShellP
                 <PresentationIcon />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Quick show</TooltipContent>
+            <TooltipContent>Quick show (Q)</TooltipContent>
           </Tooltip>
-          <Button variant="outline" onClick={onQuickShow} className="max-sm:hidden">
+          <Button variant="outline" onClick={onQuickShow} aria-keyshortcuts="Q" className="max-sm:hidden">
             <PresentationIcon data-icon="inline-start" />
             Quick show
           </Button>
