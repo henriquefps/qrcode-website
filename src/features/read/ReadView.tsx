@@ -5,6 +5,7 @@ import { detectFromBlob, type DetectedCode } from '@/lib/decode';
 import { CameraScanner } from './CameraScanner';
 import { ImageSource } from './ImageSource';
 import { ResultPanel } from './ResultPanel';
+import { useIncomingFiles } from './useIncomingFiles';
 
 type Source = 'camera' | 'image';
 
@@ -34,6 +35,19 @@ export function ReadView() {
       setBusy(false);
     }
   }, []);
+
+  // Images shared to the installed app or opened with it (share sheet, "Open with").
+  useIncomingFiles(
+    (file) => {
+      setCodes([]);
+      setSource('image');
+      void readImage(file);
+    },
+    () => {
+      setSource('image');
+      setMessage('No image arrived. Share or open a PNG, JPEG, WebP or GIF file.');
+    },
+  );
 
   // Paste an image (screenshot) anywhere while Read is active.
   useEffect(() => {

@@ -16,29 +16,20 @@ export default defineConfig({
     cloudflare(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Own service worker (src/pwa/sw.ts): Workbox precache and runtime caching plus the Web Share Target POST handler.
+      strategies: 'injectManifest',
+      srcDir: 'src/pwa',
+      filename: 'sw.ts',
       // The Cloudflare plugin writes client assets into cf's Build Output, not dist/.
       outDir: '.cloudflare/output/v0/workers/default/assets',
       // public/manifest.webmanifest is served as is and linked from index.html.
       manifest: false,
       includeAssets: ['favicon.ico', 'icon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png', 'manifest.webmanifest'],
-      workbox: {
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         // og.png is only for link previews; the zxing WASM fallback (binary + its chunk) and Inter's
-        // non-Latin subsets are cached on first use instead of precached.
+        // non-Latin subsets are cached on first use (see the runtime routes in src/pwa/sw.ts) instead of precached.
         globIgnores: ['**/og.png', '**/wasm-*.js', '**/*.wasm', '**/*-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*.woff2'],
-        navigateFallbackDenylist: [/^\/sw\.js$/],
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => /\/assets\/(wasm-.*\.js|.*\.wasm)$/.test(url.pathname),
-            handler: 'CacheFirst',
-            options: { cacheName: 'zxing-wasm', expiration: { maxEntries: 6 }, cacheableResponse: { statuses: [200] } },
-          },
-          {
-            urlPattern: ({ url }) => /\/assets\/.*\.woff2$/.test(url.pathname),
-            handler: 'CacheFirst',
-            options: { cacheName: 'fonts', expiration: { maxEntries: 20 }, cacheableResponse: { statuses: [200] } },
-          },
-        ],
       },
     }),
   ],
