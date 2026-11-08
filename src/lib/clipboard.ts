@@ -2,9 +2,9 @@
  * Clipboard auto-clear for secrets (Wi-Fi passwords, OTP secrets, masked text).
  *
  * After a delay we overwrite the clipboard with an empty string, but only if it still holds what we
- * copied. Reading the clipboard is only attempted when the `clipboard-read` permission is already
- * granted, so the user never gets a surprise paste prompt; otherwise we clear unconditionally
- * (best effort). Browsers only allow clipboard writes while the document has focus, so when the
+ * copied when the environment can read it without prompting; otherwise we clear unconditionally
+ * (best effort). In the browser the site blocks clipboard reads by policy, so the clear is always
+ * unconditional there; the comparison path is kept for environments that allow it. Browsers only allow clipboard writes while the document has focus, so when the
  * time is up in a background tab the clear waits until the page is focused again.
  * Nothing is persisted: a reload or closing the tab drops the pending clear.
  */
@@ -123,14 +123,9 @@ export function scheduleClear(copied: string, env: AutoClearEnv, callbacks: Auto
 export function browserEnv(): AutoClearEnv {
   return {
     clipboard: typeof navigator !== 'undefined' ? navigator.clipboard : undefined,
-    async canRead() {
-      try {
-        const status = await navigator.permissions.query({ name: 'clipboard-read' as PermissionName });
-        return status.state === 'granted';
-      } catch {
-        return false;
-      }
-    },
+    // The site's Permissions-Policy sets `clipboard-read=()` (public/_headers), so reading is never
+    // possible in production and even probing it logs a policy warning: always clear best effort.
+    canRead: async () => false,
     hasFocus: () => document.hasFocus(),
     onFocus(cb) {
       window.addEventListener('focus', cb);

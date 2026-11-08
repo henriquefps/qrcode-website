@@ -1,35 +1,10 @@
-import { useSyncExternalStore } from 'react';
 import { toast } from 'sonner';
 import { AUTO_CLEAR_MS, cancelPendingClear, copyWithAutoClear } from '@/lib/clipboard';
+import { ClearCountdown } from './ClearCountdown';
+import { setSecondsLeft } from './secondsStore';
 
 const CLEAR_TOAST = 'clipboard-auto-clear';
 const SECONDS = AUTO_CLEAR_MS / 1000;
-
-// The countdown toast is created once and re-renders itself from this tiny store,
-// instead of re-creating the toast every second.
-let secondsLeft = SECONDS;
-const listeners = new Set<() => void>();
-function setSecondsLeft(s: number) {
-  secondsLeft = s;
-  listeners.forEach((l) => l());
-}
-const subscribe = (l: () => void) => {
-  listeners.add(l);
-  return () => listeners.delete(l);
-};
-
-function Countdown() {
-  const s = useSyncExternalStore(subscribe, () => secondsLeft);
-  return (
-    <span>
-      {/* Screen readers hear one stable sentence instead of a number every second. */}
-      <span className="sr-only">Copied. The clipboard will be cleared in {SECONDS} seconds.</span>
-      <span aria-hidden="true">
-        Copied. Clipboard clears in <span className="tabular-nums">{s}</span> s
-      </span>
-    </span>
-  );
-}
 
 function finish(show: () => void) {
   toast.dismiss(CLEAR_TOAST);
@@ -58,11 +33,24 @@ export async function copyText(text: string, { secret = false }: { secret?: bool
         finish(() => {
           if (outcome === 'cleared') toast.success('Clipboard cleared', { duration: 3000 });
           else if (outcome === 'changed') toast('You copied something else since, so the clipboard was left as is', { duration: 4000 });
-          else toast.error('Could not clear the clipboard. Copy something else to replace the secret.', { duration: 6000 });
+          // Safari and Firefox only write to the clipboard during a user action: offer a button.
+          else
+            toast.error('The browser did not let us clear the clipboard automatically', {
+              duration: Infinity,
+              action: {
+                label: 'Clear now',
+                onClick: () => {
+                  void navigator.clipboard.writeText('').then(
+                    () => toast.success('Clipboard cleared'),
+                    () => toast.error('Could not clear the clipboard. Copy something else to replace the secret.'),
+                  );
+                },
+              },
+            });
         });
       },
     });
-    toast(<Countdown />, {
+    toast(<ClearCountdown />, {
       id: CLEAR_TOAST,
       duration: Infinity,
       action: {
