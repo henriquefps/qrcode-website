@@ -27,6 +27,12 @@ registerRoute(
   new CacheFirst({ cacheName: 'zxing-wasm', plugins: [new ExpirationPlugin({ maxEntries: 6 }), new CacheableResponsePlugin({ statuses: [200] })] }),
 );
 
+// jszip (Create > Batch only), on first use.
+registerRoute(
+  ({ url }) => /\/assets\/jszip-.*\.js$/.test(url.pathname),
+  new CacheFirst({ cacheName: 'jszip', plugins: [new ExpirationPlugin({ maxEntries: 2 }), new CacheableResponsePlugin({ statuses: [200] })] }),
+);
+
 // Non-Latin Inter subsets, on first use.
 registerRoute(
   ({ url }) => /\/assets\/.*\.woff2$/.test(url.pathname),
