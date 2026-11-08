@@ -1,0 +1,39 @@
+# Deploy
+
+Qrcode is a single Cloudflare Worker named `qrcode`: static assets (the Vite client build, SPA fallback to `index.html`) plus a tiny entrypoint, `worker/index.ts` (only `export default`; workerd rejects other named exports). Config lives in `cloudflare.config.ts` (the `cf` CLI; there is no Wrangler config).
+
+- `qrcode.hfps.dev` → the app (assets).
+- `qrgo.hfps.dev` → the Worker answers `/sw.js` with a self-unregistering service worker (drops old Qrgo PWA caches and sends open windows to https://qrcode.hfps.dev) and 301-redirects every other path to `https://qrcode.hfps.dev<path+query>`.
+
+`runWorkerFirst: true` is required because assets patterns can't filter by host, so the Worker sees every request and passes non-qrgo hosts to `env.ASSETS`.
+
+## Commands
+
+`cf` needs Node >= 22.18 and does not run under Bun; the scripts call it with `node`. Bun stays for install/build/test.
+
+```sh
+bun run build       # vite build; writes assets + worker to .cloudflare/output/v0/ (gitignored)
+bun run deploy:dry  # build + `cf deploy --dry-run` (no upload, no DNS)
+bun run deploy      # build + `cf deploy` (publishes the Worker and both custom domains)
+bun run test        # includes worker routing tests (worker/routing.test.ts)
+```
+
+## PWA plugin note
+
+The Vite config uses `@cloudflare/vite-plugin`, which writes client assets into cf's Build Output, not `dist/`. When `vite-plugin-pwa` is added, set its `outDir` to `.cloudflare/output/v0/workers/default/assets` (as in Designer) so `sw.js` and the precache manifest land in the deployed assets.
+
+Caching: `public/_headers` serves `sw.js`, `registerSW.js`, `index.html`, `/` and `manifest.json` with `no-cache`, and `/assets/*` as immutable.
+
+## Manual step before the first deploy: free `qrgo.hfps.dev`
+
+`qrgo.hfps.dev` is currently attached to the Pages project `qrgo`, with a DNS CNAME `qrgo.hfps.dev` → `qrgo-1d3.pages.dev`. A hostname can have only one owner, so before the deploy:
+
+1. Remove the DNS CNAME `qrgo.hfps.dev` → `qrgo-1d3.pages.dev` (the Worker custom-domain attach needs the name free).
+2. Detach the domain from Pages (this takes qrgo.hfps.dev offline until the Worker deploys, so deploy right after):
+
+```sh
+cf pages domains delete qrgo.hfps.dev --project-name qrgo --dry-run   # preview only
+cf pages domains delete qrgo.hfps.dev --project-name qrgo             # asks for confirmation
+```
+
+3. `bun run deploy`. The Pages project itself can stay.
