@@ -5,6 +5,7 @@ import { AppShell } from '@/components/shell/AppShell';
 import { useHashRoute } from '@/hooks/useHashRoute';
 import { CreateView } from '@/features/create/CreateView';
 import { useTheme } from '@/theme/theme';
+import { useShowRoute } from '@/features/show/showRoute';
 
 // Read and Quick show are loaded on first use; the scanner stack is not needed to create a code.
 const ReadView = lazy(() => import('@/features/read/ReadView').then((m) => ({ default: m.ReadView })));
@@ -19,6 +20,8 @@ export function App() {
     setQuickShowOpen(true);
   };
   const theme = useTheme();
+  // The manifest's "Quick show" shortcut opens #/show.
+  useShowRoute(openQuickShow);
 
   // `Q` opens Quick show unless the user is typing or a dialog is already open.
   useEffect(() => {
