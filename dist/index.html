@@ -1,64 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light" data-palette="blue">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- PWA Support -->
-  <link rel="manifest" href="./manifest.json">
-  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f5f1">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1c19">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="QRGo">
-
-  <!-- SEO Meta Tags -->
-  <title>QRGo | Free Custom QR Code Generator — No Login</title>
-  <meta name="description"
-    content="Design free custom QR codes with gradients, logos, and custom shapes for WiFi, vCard, Email, SMS, and URLs. 100% client-side, no login, your data never leaves the browser.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#2f6fb5">
+  <title>Qrcode — Free QR code generator and reader</title>
+  <meta name="description" content="Create custom QR codes and read them with your camera. Free, open source, no account, everything stays in your browser.">
   <meta name="author" content="Henrique Silva">
-  <meta name="robots" content="index, follow">
-
-  <!-- Open Graph / Social Media Metas -->
-  <meta property="og:title" content="QRGo | Free Custom QR Code Generator — No Login">
-  <meta property="og:description"
-    content="Design free custom QR codes with gradients, logos, and custom shapes. 100% client-side and free.">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="QRGo">
-  <meta property="og:image" content="/icon-512.png">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="/icon-512.png">
-
-  <!-- JSON-LD structured data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "QRGo",
-    "applicationCategory": "UtilitiesApplication",
-    "operatingSystem": "Any",
-    "offers": { "@type": "Offer", "price": "0" },
-    "author": { "@type": "Person", "name": "Henrique Silva", "url": "https://hfps.dev" }
-  }
-  </script>
-
-  <!-- Apply the saved theme before first paint to avoid a flash (light by default) -->
-  <script>
-    (function () {
-      try {
-        if (localStorage.getItem('qrgo_theme') === 'dark') {
-          document.documentElement.classList.add('dark');
-        }
-      } catch (e) { }
-    })();
-  </script>
-
-  <link rel="icon" type="image/png" href="./favicon.png">
-  <script type="module" crossorigin src="./assets/index-CZCTO3Sk.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-D4xvIQXX.css">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <script type="module" crossorigin src="/assets/index-CdTxxWKh.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CJGGHSt-.css">
 </head>
 
 <body>

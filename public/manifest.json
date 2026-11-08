@@ -1,6 +1,6 @@
 {
-  "name": "QRGo",
-  "short_name": "QRGo",
+  "name": "Qrcode",
+  "short_name": "Qrcode",
   "description": "Craft visually stunning, high-fidelity custom QR codes in real-time, completely client-side.",
   "start_url": "./index.html",
   "display": "standalone",
