@@ -23,7 +23,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { OTP_ALGORITHMS, OTP_DIGITS, randomSecret } from '@/lib/otp';
+import { OTP_ALGORITHMS, OTP_DIGITS, randomSecret } from '@/lib/otpauth';
 import { CONTENT_TYPES, type ContentType, type FieldErrors, type FormValues, type OtpAlgorithm, type WifiSecurity } from '@/lib/qrData';
 
 const CONTENT_TYPE_INFO: Record<ContentType, { label: string; Icon: typeof LinkSimpleIcon }> = {
