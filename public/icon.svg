@@ -1,1 +1,16 @@
-<svg viewBox="0 0 512 512" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="display: block; overflow: hidden;"><rect width="512" height="512" fill="#ffffff"/><g transform="translate(256, 256) rotate(0)" opacity="1" class="canvas-element-group " style="cursor: move;"><g transform="translate(-225, -225)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="450" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code" aria-hidden="true" style="width: 100%; height: 100%; display: block;"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="512" height="512"><rect width="128" height="128" rx="28" fill="#2f6fb5"/><g transform="translate(14 14) scale(0.78125)">
+<g stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <rect x="12" y="12" width="36" height="36" rx="8"/>
+  <rect x="80" y="12" width="36" height="36" rx="8"/>
+  <rect x="12" y="80" width="36" height="36" rx="8"/>
+</g>
+<g fill="#fff">
+  <rect x="24" y="24" width="12" height="12" rx="3"/>
+  <rect x="92" y="24" width="12" height="12" rx="3"/>
+  <rect x="24" y="92" width="12" height="12" rx="3"/>
+  <rect x="80" y="80" width="14" height="14" rx="3"/>
+  <rect x="102" y="80" width="14" height="14" rx="3"/>
+  <rect x="80" y="102" width="14" height="14" rx="3"/>
+  <rect x="102" y="102" width="14" height="14" rx="3" opacity="0.7"/>
+</g>
+</g></svg>

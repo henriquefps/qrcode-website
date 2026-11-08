@@ -1,11 +1,11 @@
-import { useState, type ReactNode } from 'react';
+import { lazy, Suspense, useState, type ReactNode } from 'react';
 import { InfoIcon, QrCodeIcon, PresentationIcon } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ThemeMenu } from '@/theme/ThemeMenu';
 import type { Route } from '@/hooks/useHashRoute';
 import { TopNav } from './TopNav';
-import { AboutDialog } from './AboutDialog';
+const AboutDialog = lazy(() => import('./AboutDialog').then((m) => ({ default: m.AboutDialog })));
 
 interface AppShellProps {
   route: Route;
@@ -17,6 +17,7 @@ interface AppShellProps {
 /** Header (brand, Create | Read, Quick show, theme, About) around one raised content surface. */
 export function AppShell({ route, onNavigate, onQuickShow, children }: AppShellProps) {
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [aboutLoaded, setAboutLoaded] = useState(false);
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="mx-auto flex h-14 w-full max-w-6xl items-center gap-1 px-3 sm:gap-2 sm:px-4 md:px-6">
@@ -41,7 +42,10 @@ export function AppShell({ route, onNavigate, onQuickShow, children }: AppShellP
             Quick show
           </Button>
           <ThemeMenu />
-          <Button variant="ghost" size="icon" onClick={() => setAboutOpen(true)} aria-label="About">
+          <Button variant="ghost" size="icon" onClick={() => {
+              setAboutLoaded(true);
+              setAboutOpen(true);
+            }} aria-label="About">
             <InfoIcon />
           </Button>
         </div>
@@ -49,7 +53,11 @@ export function AppShell({ route, onNavigate, onQuickShow, children }: AppShellP
       <main className="mx-auto mb-2 flex w-full max-w-6xl flex-1 flex-col px-2 md:mb-4 md:px-4">
         <div className="flex-1 rounded-xl border bg-card shadow-xs">{children}</div>
       </main>
-      <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
+      {aboutLoaded && (
+        <Suspense fallback={null}>
+          <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
+        </Suspense>
+      )}
     </div>
   );
 }

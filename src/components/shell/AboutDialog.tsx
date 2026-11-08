@@ -29,6 +29,8 @@ const CREDITS = [
   ['Phosphor icons', 'MIT license', 'https://github.com/phosphor-icons/homepage/blob/master/LICENSE'],
   ['Inter', 'SIL Open Font License 1.1', 'https://openfontlicense.org/'],
   ['qr-code-styling', 'MIT license', 'https://github.com/kozakdenys/qr-code-styling'],
+  ['zxing-wasm and barcode-detector (camera fallback)', 'MIT license', 'https://github.com/Sec-ant/zxing-wasm'],
+  ['ZXing-C++ (compiled into the fallback decoder)', 'Apache License 2.0', 'https://github.com/zxing-cpp/zxing-cpp/blob/master/LICENSE'],
   ['React, Radix UI, shadcn/ui, Tailwind CSS', 'MIT license', 'https://ui.shadcn.com/'],
 ] as const;
 
