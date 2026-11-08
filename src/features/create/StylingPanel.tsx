@@ -323,7 +323,7 @@ export function StylingPanel({ style, setStyle, onExport, onImport }: StylingPan
           <AccordionTrigger>Logo</AccordionTrigger>
           <AccordionContent>
             <div className="flex flex-col gap-4">
-              <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-7" role="group" aria-label="Logo presets">
+              <div className="grid grid-cols-4 gap-1.5" role="group" aria-label="Logo presets">
                 {LOGO_PRESETS.map(({ id, label, Icon }) => (
                   <button
                     key={id}
