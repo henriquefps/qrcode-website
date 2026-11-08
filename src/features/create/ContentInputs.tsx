@@ -3,7 +3,6 @@ import {
   ArrowsClockwiseIcon,
   CalendarBlankIcon,
   ChatTextIcon,
-  CrosshairIcon,
   EnvelopeSimpleIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -16,7 +15,6 @@ import {
   WhatsappLogoIcon,
   WifiHighIcon,
 } from '@phosphor-icons/react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -216,26 +214,6 @@ function OtpInputs({ values: v, errors, onChange }: Omit<InputsProps, 'type'>) {
 }
 
 function GeoInputs({ values: v, errors, onChange }: Omit<InputsProps, 'type'>) {
-  const [locating, setLocating] = useState(false);
-  const locate = () => {
-    if (!('geolocation' in navigator)) {
-      toast.error('Location is not available in this browser.');
-      return;
-    }
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocating(false);
-        onChange('geoLat', pos.coords.latitude.toFixed(6));
-        onChange('geoLng', pos.coords.longitude.toFixed(6));
-      },
-      () => {
-        setLocating(false);
-        toast.error('Could not get your location.');
-      },
-      { enableHighAccuracy: true, timeout: 10000 },
-    );
-  };
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <Field id="input-geo-lat" label="Latitude" placeholder="38.7223" inputMode="decimal" value={v.geoLat} error={errors.geoLat} onChange={(x) => onChange('geoLat', x)} />
@@ -249,12 +227,6 @@ function GeoInputs({ values: v, errors, onChange }: Omit<InputsProps, 'type'>) {
         hint="Without coordinates, map apps search for this text."
         onChange={(x) => onChange('geoQuery', x)}
       />
-      <div className="sm:col-span-2">
-        <Button variant="outline" onClick={locate} disabled={locating}>
-          <CrosshairIcon data-icon="inline-start" />
-          {locating ? 'Locating…' : 'Use my location'}
-        </Button>
-      </div>
     </div>
   );
 }
