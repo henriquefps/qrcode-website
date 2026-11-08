@@ -205,11 +205,7 @@ export function parseGeo(text: string): Parsed | null {
     { label: 'Longitude', value: m[2], copy: true },
   ];
   if (m[3]) fields.push({ label: 'Altitude', value: `${m[3]} m` });
-  fields.push({
-    label: 'Map',
-    value: 'Open in OpenStreetMap',
-    href: `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=16/${lat}/${lon}`,
-  });
+  // Map links are offered as actions (see lib/actions).
   return { kind: 'geo', title: 'Location', fields };
 }
 

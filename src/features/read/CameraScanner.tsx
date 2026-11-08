@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { detect, type DetectedCode } from '@/lib/decode';
+import { startScanLoop, vibrate } from '@/lib/scanLoop';
+import { drawHighlights } from './highlight';
 
 type CameraError = 'denied' | 'none' | 'busy' | 'insecure' | 'unsupported' | 'unknown';
 
@@ -23,8 +25,6 @@ function classify(error: unknown): CameraError {
   if (name === 'NotReadableError' || name === 'AbortError') return 'busy';
   return 'unknown';
 }
-
-const SCAN_INTERVAL_MS = 100;
 
 interface CameraScannerProps {
   onDetect: (codes: DetectedCode[]) => void;
@@ -128,75 +128,30 @@ export function CameraScanner({ onDetect }: CameraScannerProps) {
   // Scan loop: requestAnimationFrame throttled to ~10 fps.
   useEffect(() => {
     if (!active) return;
-    let raf = 0;
-    let last = 0;
-    let busy = false;
-    let stopped = false;
-
-    const draw = (codes: DetectedCode[]) => {
-      const canvas = overlayRef.current;
-      const video = videoRef.current;
-      if (!canvas || !video) return;
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      if (canvas.width !== w) canvas.width = w;
-      if (canvas.height !== h) canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      ctx.clearRect(0, 0, w, h);
-      const vw = video.videoWidth;
-      const vh = video.videoHeight;
-      if (!vw || !vh) return;
-      const scale = Math.min(w / vw, h / vh);
-      const ox = (w - vw * scale) / 2;
-      const oy = (h - vh * scale) / 2;
-      const color = getComputedStyle(canvas).color;
-      ctx.lineWidth = 4;
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = color;
-      ctx.fillStyle = color;
-      ctx.globalAlpha = 1;
-      for (const code of codes) {
-        if (!code.corners?.length) continue;
-        ctx.beginPath();
-        code.corners.forEach((p, i) => (i === 0 ? ctx.moveTo(ox + p.x * scale, oy + p.y * scale) : ctx.lineTo(ox + p.x * scale, oy + p.y * scale)));
-        ctx.closePath();
-        ctx.stroke();
-        ctx.globalAlpha = 0.2;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-    };
-
-    const tick = (now: number) => {
-      if (stopped) return;
-      raf = requestAnimationFrame(tick);
-      const video = videoRef.current;
-      if (busy || now - last < SCAN_INTERVAL_MS || !video || video.readyState < 2 || video.videoWidth === 0) return;
-      last = now;
-      busy = true;
-      detect(video)
-        .then((codes) => {
-          if (stopped) return;
-          draw(codes);
-          if (codes.length > 0) {
-            stopped = true;
-            // Brief pause so the highlight is visible, then hand over and release the camera.
-            window.setTimeout(() => {
-              setActive(false);
-              onDetectRef.current(codes);
-            }, 350);
-          }
-        })
-        .catch(() => undefined)
-        .finally(() => {
-          busy = false;
-        });
-    };
-    raf = requestAnimationFrame(tick);
+    let handover = 0;
+    const stop = startScanLoop<HTMLVideoElement>({
+      getSource: () => {
+        const video = videoRef.current;
+        return video && video.readyState >= 2 && video.videoWidth > 0 ? video : null;
+      },
+      detect,
+      onFrame: (codes) => {
+        const canvas = overlayRef.current;
+        const video = videoRef.current;
+        if (canvas && video) drawHighlights(canvas, video, codes);
+      },
+      onFound: (codes) => {
+        vibrate(50);
+        // Brief pause so the highlight is visible, then hand over and release the camera.
+        handover = window.setTimeout(() => {
+          setActive(false);
+          onDetectRef.current(codes);
+        }, 350);
+      },
+    });
     return () => {
-      stopped = true;
-      cancelAnimationFrame(raf);
+      stop();
+      window.clearTimeout(handover);
     };
   }, [active]);
 
