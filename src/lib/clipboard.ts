@@ -3,8 +3,8 @@
  *
  * After a delay we overwrite the clipboard with an empty string, but only if it still holds what we
  * copied when the environment can read it without prompting; otherwise we clear unconditionally
- * (best effort). In the browser the site blocks clipboard reads by policy, so the clear is always
- * unconditional there; the comparison path is kept for environments that allow it. Browsers only allow clipboard writes while the document has focus, so when the
+ * (best effort). In the browser we never read (it would prompt), so the clear is always unconditional
+ * there; the comparison path is kept for environments that allow it. Browsers only allow clipboard writes while the document has focus, so when the
  * time is up in a background tab the clear waits until the page is focused again.
  * Nothing is persisted: a reload or closing the tab drops the pending clear.
  */
@@ -123,8 +123,9 @@ export function scheduleClear(copied: string, env: AutoClearEnv, callbacks: Auto
 export function browserEnv(): AutoClearEnv {
   return {
     clipboard: typeof navigator !== 'undefined' ? navigator.clipboard : undefined,
-    // The site's Permissions-Policy sets `clipboard-read=()` (public/_headers), so reading is never
-    // possible in production and even probing it logs a policy warning: always clear best effort.
+    // We never read the clipboard in the browser (it would prompt): always clear best effort.
+    // `clipboard-read=(self)` in public/_headers exists only because Chrome gates timer-driven
+    // writes (the clear) on that policy, not to read.
     canRead: async () => false,
     hasFocus: () => document.hasFocus(),
     onFocus(cb) {

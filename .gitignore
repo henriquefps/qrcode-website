@@ -4,3 +4,6 @@ node_modules/
 .profile
 .cloudflare/
 *.tsbuildinfo
+e2e/.fixtures/
+test-results/
+playwright-report/

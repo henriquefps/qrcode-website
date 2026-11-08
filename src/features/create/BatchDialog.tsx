@@ -72,6 +72,8 @@ export default function BatchDialog({ open, onOpenChange, type, typeLabel, value
 
   const plan = useMemo(() => planBatch(type, rows, current.mapping, current.nameColumn, values), [type, rows, current.mapping, current.nameColumn, values]);
   const running = progress !== null;
+  // Same padding as planBatch: enough digits for the row count, so the files sort in order.
+  const firstIndexName = `qrcode-${'1'.padStart(String(Math.max(1, Math.min(rows.length, MAX_BATCH_ROWS))).length, '0')}`;
 
   const loadFile = (file: File | undefined) => {
     if (!file) return;
@@ -264,7 +266,7 @@ export default function BatchDialog({ open, onOpenChange, type, typeLabel, value
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={NOT_USED}>Row number (qrcode-001)</SelectItem>
+                  <SelectItem value={NOT_USED}>Row number ({firstIndexName})</SelectItem>
                   {mode === 'csv' &&
                     columns.map((c, idx) => (
                       <SelectItem key={idx} value={String(idx)}>

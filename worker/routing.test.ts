@@ -43,4 +43,24 @@ describe('worker routing', () => {
     expect(body).toContain('https://qrcode.hfps.dev/');
     expect(e.ASSETS.fetch).not.toHaveBeenCalled();
   });
+
+  it('sends a share that reaches the Worker (no service worker yet) to Read without storing it', async () => {
+    const e = env();
+    const form = new FormData();
+    form.append('image', new File([new Uint8Array([1, 2, 3])], 'shot.png', { type: 'image/png' }));
+    const request = new Request('https://qrcode.hfps.dev/share-target', { method: 'POST', body: form });
+    const res = await handle(request, e);
+    expect(res.status).toBe(303);
+    expect(res.headers.get('location')).toBe('https://qrcode.hfps.dev/#/read');
+    expect(res.headers.get('cache-control')).toBe('no-store');
+    expect(await res.text()).toBe('');
+    expect(request.bodyUsed).toBe(false);
+    expect(e.ASSETS.fetch).not.toHaveBeenCalled();
+  });
+
+  it('also redirects a GET to /share-target', async () => {
+    const res = await handle(new Request('https://qrcode.hfps.dev/share-target'), env());
+    expect(res.status).toBe(303);
+    expect(res.headers.get('location')).toBe('https://qrcode.hfps.dev/#/read');
+  });
 });
