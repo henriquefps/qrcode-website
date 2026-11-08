@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import QRCodeStyling from 'qr-code-styling';
-import { CopySimpleIcon, DeviceMobileCameraIcon, DownloadSimpleIcon, FileSvgIcon } from '@phosphor-icons/react';
+import { CheckCircleIcon, CircleNotchIcon, CopySimpleIcon, DeviceMobileCameraIcon, DownloadSimpleIcon, FileSvgIcon, InfoIcon, QuestionIcon, WarningIcon } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { buildQrOptions } from '@/lib/qrOptions';
 import type { StyleConfig } from '@/lib/preset';
+import { cn } from '@/lib/utils';
+import { useScanCheck, type ScanStatus } from './useScanCheck';
 
 const PNG_SIZES = [256, 512, 1024] as const;
 const PREVIEW_SIZE = 280;
@@ -20,6 +22,41 @@ const CHECKERBOARD = {
   backgroundSize: '16px 16px',
   backgroundPosition: '0 0, 8px 8px',
 };
+
+const STATUS: Record<ScanStatus, { label: string; Icon: typeof CheckCircleIcon; className: string; detail: string }> = {
+  checking: { label: 'Checking…', Icon: CircleNotchIcon, className: 'text-muted-foreground [&>svg]:animate-spin', detail: 'Decoding the code to check that it scans.' },
+  scannable: { label: 'Scannable', Icon: CheckCircleIcon, className: 'border-primary/40 bg-primary/10 text-primary', detail: 'Decoded correctly at full and small size.' },
+  risky: { label: 'May not scan', Icon: WarningIcon, className: 'border-warning/40 bg-warning/10 text-warning', detail: 'Decodes on screen, but real cameras may struggle (see below).' },
+  small: { label: 'May not scan', Icon: WarningIcon, className: 'border-warning/40 bg-warning/10 text-warning', detail: 'Decodes at full size, but not when printed small (about 200 px).' },
+  unscannable: { label: 'May not scan', Icon: WarningIcon, className: 'border-warning/40 bg-warning/10 text-warning', detail: 'Our decoder could not read this code.' },
+  unavailable: { label: 'Not checked', Icon: QuestionIcon, className: 'text-muted-foreground', detail: 'The decoder could not load (offline?). Test with a phone.' },
+};
+
+function ScanStatusView({ data, style }: { data: string; style: StyleConfig }) {
+  const { status, hints } = useScanCheck(data, style, PREVIEW_SIZE);
+  const { label, Icon, className, detail } = STATUS[status];
+  return (
+    <div className="flex w-full flex-col gap-2" role="status" aria-live="polite" aria-atomic="true">
+      <div className="flex items-center gap-2">
+        <Badge variant="outline" className={cn('gap-1.5', className)}>
+          <Icon aria-hidden="true" />
+          {label}
+        </Badge>
+        <span className="text-xs text-muted-foreground">{detail}</span>
+      </div>
+      {hints.length > 0 && (
+        <ul className="flex flex-col gap-1.5 text-[0.8125rem] text-muted-foreground" aria-label="Scan tips">
+          {hints.map((h) => (
+            <li key={h.id} className="flex gap-2">
+              {h.severity === 'high' ? <WarningIcon className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" /> : <InfoIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />}
+              <span>{h.message}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 interface LivePreviewProps {
   data: string;
@@ -91,6 +128,8 @@ export function LivePreview({ data, style }: LivePreviewProps) {
       >
         <div ref={containerRef} role="img" aria-label="QR code preview" className="flex items-center justify-center [&_canvas]:h-auto [&_canvas]:max-w-full" />
       </div>
+
+      <ScanStatusView data={data} style={style} />
 
       <p className="flex items-center gap-2 text-sm text-muted-foreground">
         <DeviceMobileCameraIcon className="size-4 shrink-0" aria-hidden="true" />
