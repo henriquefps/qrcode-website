@@ -62,6 +62,9 @@ function TabsTrigger({
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
+      // The app uses Tabs as segmented controls without TabsContent panels, so Radix's generated
+      // aria-controls would point at an element that does not exist. Pass it explicitly with a panel.
+      aria-controls={undefined}
       // Radix focuses the trigger from script on mousedown, which Chrome treats as
       // :focus-visible. Focusing first without the ring keeps it for keyboard only.
       onMouseDown={(event) => {

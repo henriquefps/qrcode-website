@@ -30,6 +30,12 @@ describe('public/_headers security headers', () => {
     expect(pp).toContain('geolocation=()');
   });
 
+  it('allows clipboard-read for our origin so Chrome lets the timer-driven clipboard clear write', () => {
+    const pp = header('Permissions-Policy');
+    expect(pp).toContain('clipboard-read=(self)');
+    expect(pp).not.toContain('clipboard-read=()');
+  });
+
   it('sends the simple hardening headers', () => {
     expect(header('Referrer-Policy')).toBe('no-referrer');
     expect(header('X-Content-Type-Options')).toBe('nosniff');

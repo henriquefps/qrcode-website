@@ -16,6 +16,8 @@ export default defineConfig({
     cloudflare(),
     VitePWA({
       registerType: 'autoUpdate',
+      // A deferred <script> for registerSW.js: the default classic script in <head> blocks the first paint.
+      injectRegister: 'script-defer',
       // Own service worker (src/pwa/sw.ts): Workbox precache and runtime caching plus the Web Share Target POST handler.
       strategies: 'injectManifest',
       srcDir: 'src/pwa',

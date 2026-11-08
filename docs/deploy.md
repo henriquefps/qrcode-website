@@ -3,6 +3,7 @@
 Qrcode is a single Cloudflare Worker named `qrcode`: static assets (the Vite client build, SPA fallback to `index.html`) plus a tiny entrypoint, `worker/index.ts` (only `export default`; workerd rejects other named exports). Config lives in `cloudflare.config.ts` (the `cf` CLI; there is no Wrangler config).
 
 - `qrcode.hfps.dev` → the app (assets).
+- `POST /share-target` normally never reaches the Worker (the service worker answers it). If it does (the service worker is not active yet), the Worker answers 303 to `/#/read` without reading the body.
 - `qrgo.hfps.dev` → the Worker answers `/sw.js` with a self-unregistering service worker (drops old Qrgo PWA caches and sends open windows to https://qrcode.hfps.dev) and 301-redirects every other path to `https://qrcode.hfps.dev<path+query>`.
 
 `runWorkerFirst: true` is required because assets patterns can't filter by host, so the Worker sees every request and passes non-qrgo hosts to `env.ASSETS`.
@@ -31,7 +32,7 @@ Caching: `public/_headers` serves `sw.js`, `registerSW.js`, `index.html`, `/` an
 | Header | Value | Why |
 | --- | --- | --- |
 | `Content-Security-Policy` | `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' data: blob:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'` | Nothing is loaded from or sent to another origin. `'wasm-unsafe-eval'` is for the zxing WASM decoder (the `.wasm` is bundled, not fetched from a CDN). `blob:`/`data:` cover the camera stream, QR previews, downloads and logos (qr-code-styling `fetch`es logo data URIs, so `connect-src` allows `data:` and `blob:`, which never touch the network). `'unsafe-inline'` is for styles only (Sonner and Radix inject `<style>`/style attributes); there is no inline script, and the JSON-LD block is `type="application/ld+json"` data that CSP does not execute. |
-| `Permissions-Policy` | `camera=(self), display-capture=(self), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), hid=(), midi=(), accelerometer=(), gyroscope=(), magnetometer=(), clipboard-read=(), interest-cohort=()` | Only the camera and screen capture (for reading a QR on screen) are allowed, and only for our own origin. Anything else the app does not need is off. |
+| `Permissions-Policy` | `camera=(self), display-capture=(self), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), hid=(), midi=(), accelerometer=(), gyroscope=(), magnetometer=(), clipboard-read=(self), interest-cohort=()` | Only the camera and screen capture (for reading a QR on screen) are allowed, and only for our own origin. Anything else the app does not need is off. `clipboard-read=(self)` is not used to read (the app never reads the clipboard, and a read would still prompt): Chrome also gates timer-driven `clipboard.writeText` on this policy (crbug.com/414348233), so with `clipboard-read=()` the 30-second auto-clear of a copied secret fails. |
 | `Referrer-Policy` | `no-referrer` | Links out never reveal the page. |
 | `X-Content-Type-Options` | `nosniff` | No MIME sniffing. |
 | `Cross-Origin-Opener-Policy` | `same-origin` | Isolates the browsing context from cross-origin windows. |
@@ -40,7 +41,7 @@ If a feature needs a new origin, API or inline script, change the CSP in `_heade
 
 ## CI and dependency updates
 
-`.github/workflows/ci.yml` runs on pull requests and pushes to `main`: `bun install --frozen-lockfile`, lint, `tsc -b`, tests and build. It never deploys. `.github/dependabot.yml` opens weekly grouped PRs for npm (minor and patch together) and GitHub Actions.
+`.github/workflows/ci.yml` runs on pull requests and pushes to `main`: `bun install --frozen-lockfile`, lint, `tsc -b`, tests and build, and a separate `e2e` job (Playwright Chromium, `bun run e2e`) that tests the production build served by `vite preview` (workerd, so the real Worker and `_headers` apply). Every e2e test fails on a console error, a CSP or Permissions-Policy violation, or a request to another origin. It never deploys. `.github/dependabot.yml` opens weekly grouped PRs for npm (minor and patch together) and GitHub Actions.
 
 ## Manual step before the first deploy: free `qrgo.hfps.dev`
 

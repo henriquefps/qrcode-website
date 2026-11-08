@@ -25,6 +25,25 @@ import { OtpCode } from './OtpCode';
 
 const MASK = '••••••••••••';
 
+const FORMAT_NAMES: Record<string, string> = {
+  qr_code: 'QR code',
+  micro_qr_code: 'Micro QR',
+  data_matrix: 'Data Matrix',
+  aztec: 'Aztec',
+  pdf417: 'PDF417',
+  code_128: 'Code 128',
+  code_39: 'Code 39',
+  ean_13: 'EAN-13',
+  ean_8: 'EAN-8',
+  upc_a: 'UPC-A',
+  upc_e: 'UPC-E',
+  itf: 'ITF',
+  codabar: 'Codabar',
+};
+
+/** Display name of a barcode format id (`qr_code` → "QR code"). */
+const formatName = (format: string) => FORMAT_NAMES[format] ?? format.replace(/_/g, ' ');
+
 /** Copies on user action only; secrets are cleared from the clipboard after 30 s (countdown toast). */
 function CopyButton({
   value,
@@ -198,7 +217,7 @@ function Result({ code, onScanAgain }: { code: DetectedCode; onScanAgain: () => 
         <h3 id="result-title" className="mr-auto text-lg font-semibold">
           {parsed.title}
         </h3>
-        <Badge variant="outline">{code.format.replace(/_/g, ' ')}</Badge>
+        <Badge variant="outline">{formatName(code.format)}</Badge>
         <Button variant="outline" size="icon" aria-pressed={hidden} onClick={() => setHidden((h) => !h)} aria-label={hidden ? 'Show content' : 'Hide content'}>
           {hidden ? <EyeIcon /> : <EyeSlashIcon />}
         </Button>

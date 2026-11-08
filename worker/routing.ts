@@ -26,9 +26,18 @@ export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
 }
 
+/** The manifest's share_target action; normally answered by the service worker (src/pwa/sw.ts). */
+export const SHARE_TARGET_PATH = '/share-target';
+export const READ_PATH = '/#/read';
+
 export async function handle(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
-  if (url.hostname !== OLD_HOST) return env.ASSETS.fetch(request);
+  if (url.hostname !== OLD_HOST) {
+    // A share that reaches the network means the service worker was not active yet (first launch, or it
+    // was cleared). The images are not stored anywhere: open Read instead of answering 405.
+    if (url.pathname === SHARE_TARGET_PATH) return seeOther(new URL(READ_PATH, url.origin).href);
+    return env.ASSETS.fetch(request);
+  }
 
   if (url.pathname === '/sw.js') {
     return new Response(KILL_SW, {
@@ -39,4 +48,9 @@ export async function handle(request: Request, env: Env): Promise<Response> {
     });
   }
   return Response.redirect(NEW_ORIGIN + url.pathname + url.search, 301);
+}
+
+/** 303 so the browser follows with a GET; the request body is never read. */
+function seeOther(location: string): Response {
+  return new Response(null, { status: 303, headers: { location, 'cache-control': 'no-store' } });
 }
