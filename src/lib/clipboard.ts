@@ -32,7 +32,7 @@ export type ClearOutcome = 'cleared' | 'changed' | 'failed';
 export async function clearIfUnchanged(copied: string, env: Pick<AutoClearEnv, 'clipboard' | 'canRead'>): Promise<ClearOutcome> {
   const cb = env.clipboard;
   if (!cb) return 'failed';
-  let readable = false;
+  let readable: boolean;
   try {
     readable = Boolean(cb.readText) && (await env.canRead());
   } catch {

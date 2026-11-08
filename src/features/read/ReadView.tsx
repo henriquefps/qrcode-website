@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { CameraIcon, ImageIcon, UploadSimpleIcon, WarningIcon } from '@phosphor-icons/react';
+import { CameraIcon, ImageIcon, MonitorIcon, UploadSimpleIcon, WarningIcon } from '@phosphor-icons/react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { detectFromBlob, type DetectedCode } from '@/lib/decode';
 import { CameraScanner } from './CameraScanner';
 import { ImageSource } from './ImageSource';
+import { ScreenScanner } from './ScreenScanner';
+import { isScreenCaptureSupported } from '@/lib/screenCapture';
 import { ResultPanel } from './ResultPanel';
 
-type Source = 'camera' | 'image';
+type Source = 'camera' | 'image' | 'screen';
+
+const screenSupported = isScreenCaptureSupported();
 
 /** Picks the first image out of a clipboard or drop payload. */
 function imageFrom(files: FileList | null | undefined): File | undefined {
@@ -103,6 +107,12 @@ export function ReadView() {
                 <ImageIcon aria-hidden="true" />
                 Image
               </TabsTrigger>
+              {screenSupported && (
+                <TabsTrigger value="screen" className="gap-1.5 px-3">
+                  <MonitorIcon aria-hidden="true" />
+                  Screen
+                </TabsTrigger>
+              )}
             </TabsList>
           </Tabs>
           {message && (
@@ -111,7 +121,13 @@ export function ReadView() {
               {message}
             </p>
           )}
-          {source === 'camera' ? <CameraScanner onDetect={setCodes} /> : <ImageSource busy={busy} onFile={(f) => void readImage(f)} />}
+          {source === 'camera' ? (
+            <CameraScanner onDetect={setCodes} />
+          ) : source === 'screen' ? (
+            <ScreenScanner onDetect={setCodes} />
+          ) : (
+            <ImageSource busy={busy} onFile={(f) => void readImage(f)} />
+          )}
         </>
       )}
 
