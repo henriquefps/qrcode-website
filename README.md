@@ -11,8 +11,8 @@ Live at <https://qrcode.hfps.dev> (formerly QRGo).
 
 - **Create**: URL, text, Wi-Fi, email, SMS and vCard codes. Dot, corner, color, gradient and logo styling, with style presets (JSON export and import). Download PNG (256, 512 or 1024 px) or SVG.
 - **Read**: scan with a camera (device picker, mirror, torch), open an image, drop one on the page or paste a screenshot. Wi-Fi, vCard/MeCard, `mailto:`, SMS, `tel:`, `geo:`, `otpauth://` and links are parsed; passwords and OTP secrets are masked until you reveal them. Links are never opened automatically.
-- **Quick show**: press `Q` (or use the header button), paste a password or link and get a huge black-on-white code that a phone camera reads from across a desk. `Esc` closes it and clears the text. Built for moving a secret between a computer and a phone that share no network.
-- **Installable and offline**: a PWA. The scanner fallback for browsers without `BarcodeDetector` is downloaded on first use and then also works offline.
+- **Quick show**: press `Q` (or use the header button), paste a password or link and get a huge black-on-white code that a phone camera reads from across a desk. Masked input, the screen stays on, and it closes itself after 60 seconds (add time or pause); `Esc` closes it at once. Either way the text is cleared. Built for moving a secret between a computer and a phone that share no network.
+- **Installable and offline**: a PWA. Share a screenshot to it or open an image with it to read the code; shortcuts for Read and Quick show. On browsers without `BarcodeDetector` the scanner fallback is downloaded in the background, so reading also works offline.
 - Light, dark and system themes with five palettes (default: blue).
 
 | Read a Wi-Fi code | Quick show |
