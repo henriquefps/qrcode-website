@@ -73,6 +73,8 @@ function QuickShowBody({ onClose }: { onClose: () => void }) {
   const stage = useRef<HTMLDivElement>(null);
   const exitBright = useRef<HTMLButtonElement>(null);
   const qr = useRef<QRCodeStyling | null>(null);
+  /** The holder node `qr` is drawn into: the holder unmounts when there is no code, so a new node needs a new draw. */
+  const attachedTo = useRef<HTMLDivElement | null>(null);
   const density = densityFor(text);
   const showCode = text.length > 0 && !density.tooLong;
   const warn = !paused && left <= WARN_MS;
@@ -96,10 +98,11 @@ function QuickShowBody({ onClose }: { onClose: () => void }) {
       cornersSquareOptions: { type: 'square' as const, color: '#000000' },
       cornersDotOptions: { type: 'square' as const, color: '#000000' },
     };
-    if (qr.current) {
+    if (qr.current && attachedTo.current === node) {
       qr.current.update(options);
     } else {
       qr.current = new QRCodeStyling(options);
+      attachedTo.current = node;
       node.replaceChildren();
       qr.current.append(node);
     }
