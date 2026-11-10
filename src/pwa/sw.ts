@@ -2,7 +2,7 @@
 import { clientsClaim } from 'workbox-core';
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
-import { CacheFirst } from 'workbox-strategies';
+import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { SHARE_CACHE, handleShareTarget, isShareTargetRequest } from './shareTarget';
@@ -37,6 +37,13 @@ registerRoute(
 registerRoute(
   ({ url }) => /\/assets\/.*\.woff2$/.test(url.pathname),
   new CacheFirst({ cacheName: 'fonts', plugins: [new ExpirationPlugin({ maxEntries: 20 }), new CacheableResponsePlugin({ statuses: [200] })] }),
+);
+
+// Iconify API (icon shapes, search, collection lists): the only cross-origin requests the app makes. Kept so icons seen
+// before still show, and can be picked again, offline. An icon already chosen lives in the style as a data URI anyway.
+registerRoute(
+  ({ url }) => url.origin === 'https://api.iconify.design',
+  new StaleWhileRevalidate({ cacheName: 'iconify', plugins: [new ExpirationPlugin({ maxEntries: 300, maxAgeSeconds: 60 * 60 * 24 * 30 }), new CacheableResponsePlugin({ statuses: [200] })] }),
 );
 
 // A share that was never picked up (window closed mid-handoff) is dropped when a new worker starts.

@@ -13,13 +13,17 @@ const csp = Object.fromEntries(
 );
 
 describe('public/_headers security headers', () => {
-  it('has a CSP with no remote origins or inline/eval scripts', () => {
+  it('has a CSP whose only remote origin is the Iconify API (connect-src), and no inline/eval scripts', () => {
     expect(csp['default-src']).toEqual(["'self'"]);
     expect(csp['script-src']).toEqual(["'self'", "'wasm-unsafe-eval'"]);
     expect(csp['object-src']).toEqual(["'none'"]);
     expect(csp['frame-ancestors']).toEqual(["'none'"]);
     expect(csp['base-uri']).toEqual(["'none'"]);
-    for (const values of Object.values(csp)) for (const v of values) expect(v).not.toMatch(/^(https?:|\*)/);
+    expect(csp['connect-src']).toEqual(["'self'", 'data:', 'blob:', 'https://api.iconify.design']);
+    for (const [name, values] of Object.entries(csp)) {
+      if (name === 'connect-src') continue;
+      for (const v of values) expect(v).not.toMatch(/^(https?:|\*)/);
+    }
   });
 
   it('allows the camera and screen capture for our own origin only', () => {

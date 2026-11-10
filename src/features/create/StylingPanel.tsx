@@ -1,18 +1,6 @@
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { toast } from 'sonner';
-import {
-  DownloadSimpleIcon,
-  EnvelopeSimpleIcon,
-  ExportIcon,
-  GithubLogoIcon,
-  GlobeSimpleIcon,
-  InstagramLogoIcon,
-  ProhibitIcon,
-  TrashIcon,
-  UploadSimpleIcon,
-  WhatsappLogoIcon,
-  WifiHighIcon,
-} from '@phosphor-icons/react';
+import { ArrowClockwiseIcon, CaretDownIcon, DownloadSimpleIcon, ExportIcon, MagnifyingGlassIcon, ProhibitIcon, TrashIcon, UploadSimpleIcon } from '@phosphor-icons/react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,18 +12,12 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import type { FgType, LogoPresetId, StyleConfig } from '@/lib/preset';
-import { PRESET_LOGOS } from './logos';
-
-const LOGO_PRESETS: { id: Exclude<LogoPresetId, 'custom'>; label: string; Icon: typeof ProhibitIcon }[] = [
-  { id: 'none', label: 'None', Icon: ProhibitIcon },
-  { id: 'wifi', label: 'Wi-Fi', Icon: WifiHighIcon },
-  { id: 'web', label: 'Globe', Icon: GlobeSimpleIcon },
-  { id: 'whatsapp', label: 'WhatsApp', Icon: WhatsappLogoIcon },
-  { id: 'email', label: 'Email', Icon: EnvelopeSimpleIcon },
-  { id: 'github', label: 'GitHub', Icon: GithubLogoIcon },
-  { id: 'instagram', label: 'Instagram', Icon: InstagramLogoIcon },
-];
+import type { FgType, StyleConfig } from '@/lib/preset';
+import { CURATED_ICONS } from '@/lib/logoIcons';
+import { IconCredit } from './IconCredit';
+import { IconThumb } from './IconGrid';
+import { IconSearch } from './IconSearch';
+import type { IconLogoStatus } from './useIconLogo';
 
 const HEX = /^#[0-9a-f]{6}$/i;
 
@@ -126,25 +108,25 @@ interface StylingPanelProps {
   setStyle: Dispatch<SetStateAction<StyleConfig>>;
   onExport: () => void;
   onImport: (text: string) => void;
+  iconStatus: IconLogoStatus;
+  onRetryIcon: () => void;
 }
 
 const LOGO_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml'];
 
-export function StylingPanel({ style, setStyle, onExport, onImport }: StylingPanelProps) {
+export function StylingPanel({ style, setStyle, onExport, onImport, iconStatus, onRetryIcon }: StylingPanelProps) {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const set = <K extends keyof StyleConfig>(key: K, value: StyleConfig[K]) => setStyle((prev) => ({ ...prev, [key]: value }));
 
-  const selectPreset = (preset: Exclude<LogoPresetId, 'custom'>) => {
-    setStyle((prev) =>
-      preset === 'none'
-        ? { ...prev, logoPreset: 'none', logoFile: '', logoFilename: '' }
-        : // Logos eat into the data area, so raise error correction to the maximum.
-          { ...prev, logoPreset: preset, logoFile: PRESET_LOGOS[preset], logoFilename: `${preset}-logo`, ecLevel: 'H' },
-    );
-  };
+  const removeLogo = () => setStyle((prev) => ({ ...prev, logoPreset: 'none', logoIcon: '', logoFile: '', logoFilename: '' }));
+
+  // The image itself is made by useIconLogo once the icon is known. Logos eat into the data area, so raise error correction to the maximum.
+  const selectIcon = (id: string) =>
+    setStyle((prev) => ({ ...prev, logoPreset: 'icon', logoIcon: id, logoFile: prev.logoPreset === 'icon' && prev.logoIcon === id ? prev.logoFile : '', logoFilename: id.replace(':', '-'), ecLevel: 'H' }));
 
   const processLogo = (file: File | undefined) => {
     if (!file) return;
@@ -160,7 +142,7 @@ export function StylingPanel({ style, setStyle, onExport, onImport }: StylingPan
     reader.onload = () => {
       if (typeof reader.result !== 'string') return;
       const dataUrl = reader.result;
-      setStyle((prev) => ({ ...prev, logoPreset: 'custom', logoFile: dataUrl, logoFilename: file.name, ecLevel: 'H' }));
+      setStyle((prev) => ({ ...prev, logoPreset: 'custom', logoIcon: '', logoFile: dataUrl, logoFilename: file.name, ecLevel: 'H' }));
     };
     reader.readAsDataURL(file);
   };
@@ -203,7 +185,7 @@ export function StylingPanel({ style, setStyle, onExport, onImport }: StylingPan
         </div>
       </div>
 
-      <Accordion type="multiple" defaultValue={['shapes', 'colors', 'logo']} className="w-full">
+      <Accordion type="multiple" defaultValue={['shapes', 'colors']} className="w-full">
         <AccordionItem value="shapes">
           <AccordionTrigger>Shapes and layout</AccordionTrigger>
           <AccordionContent>
@@ -324,24 +306,51 @@ export function StylingPanel({ style, setStyle, onExport, onImport }: StylingPan
           <AccordionContent>
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-4 gap-1.5" role="group" aria-label="Logo presets">
-                {LOGO_PRESETS.map(({ id, label, Icon }) => (
+                <button
+                  type="button"
+                  aria-pressed={style.logoPreset === 'none'}
+                  onClick={removeLogo}
+                  className={cn(
+                    'flex min-w-0 flex-col items-center gap-1.5 rounded-md border p-2 text-xs font-medium outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50',
+                    style.logoPreset === 'none' ? 'border-primary bg-muted text-foreground' : 'border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground',
+                  )}
+                >
+                  <ProhibitIcon className="size-5 shrink-0" aria-hidden="true" />
+                  <span className="w-full truncate text-center">None</span>
+                </button>
+                {CURATED_ICONS.map(({ id, label }) => (
                   <button
                     key={id}
                     type="button"
-                    aria-pressed={style.logoPreset === id}
-                    onClick={() => selectPreset(id)}
+                    aria-pressed={style.logoPreset === 'icon' && style.logoIcon === id}
+                    onClick={() => selectIcon(id)}
                     className={cn(
                       'flex min-w-0 flex-col items-center gap-1.5 rounded-md border p-2 text-xs font-medium outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50',
-                      style.logoPreset === id ? 'border-primary bg-muted text-foreground' : 'border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground',
+                      style.logoPreset === 'icon' && style.logoIcon === id ? 'border-primary bg-muted text-foreground' : 'border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground',
                     )}
                   >
-                    <Icon className="size-5 shrink-0" aria-hidden="true" />
+                    <IconThumb id={id} size={20} />
                     <span className="w-full truncate text-center">{label}</span>
                   </button>
                 ))}
               </div>
 
-              {!style.logoFile && (
+              <div className="flex flex-col gap-3">
+                <Button variant="outline" size="sm" className="justify-between" aria-expanded={searchOpen} aria-controls="icon-search" onClick={() => setSearchOpen((v) => !v)}>
+                  <span className="inline-flex items-center gap-2">
+                    <MagnifyingGlassIcon aria-hidden="true" />
+                    Search all icons
+                  </span>
+                  <CaretDownIcon aria-hidden="true" className={cn('transition-transform', searchOpen && 'rotate-180')} />
+                </Button>
+                {searchOpen && (
+                  <div id="icon-search">
+                    <IconSearch selected={style.logoPreset === 'icon' ? style.logoIcon : ''} onPick={selectIcon} />
+                  </div>
+                )}
+              </div>
+
+              {style.logoPreset !== 'custom' && (
                 <div
                   role="button"
                   tabIndex={0}
@@ -388,22 +397,37 @@ export function StylingPanel({ style, setStyle, onExport, onImport }: StylingPan
                 </div>
               )}
 
-              {style.logoFile && (
+              {style.logoPreset !== 'none' && (
                 <div className="flex flex-col gap-4 rounded-lg border p-4">
                   <div className="flex items-center gap-3">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-md border bg-background p-1">
-                      <img src={style.logoFile} alt="Logo preview" className="max-h-full max-w-full object-contain" />
+                      {style.logoFile ? <img src={style.logoFile} alt="Logo preview" className="max-h-full max-w-full object-contain" /> : null}
                     </div>
                     <div className="flex min-w-0 flex-1 flex-col">
                       <span className="truncate text-sm font-medium">{style.logoFilename || 'logo'}</span>
                       <Badge variant="outline" className="w-fit">
-                        Active
+                        {iconStatus === 'loading' ? 'Loading…' : iconStatus === 'error' ? 'Not loaded' : 'Active'}
                       </Badge>
                     </div>
-                    <Button variant="destructive" size="icon" onClick={() => selectPreset('none')} aria-label="Remove logo">
+                    <Button variant="destructive" size="icon" onClick={removeLogo} aria-label="Remove logo">
                       <TrashIcon />
                     </Button>
                   </div>
+                  {style.logoPreset === 'icon' && style.logoIcon && (
+                    <div className="flex flex-col gap-2">
+                      <ColorField id="color-logo-icon" label="Icon color" value={style.logoIconColor} onChange={(v) => set('logoIconColor', v)} />
+                      <IconCredit id={style.logoIcon} />
+                    </div>
+                  )}
+                  {iconStatus === 'error' && (
+                    <div role="alert" className="flex flex-col gap-2 rounded-md border border-destructive/40 p-3 text-sm">
+                      <p>Could not load this icon. Check your connection and try again, or pick another logo.</p>
+                      <Button variant="outline" size="sm" className="w-fit" onClick={onRetryIcon}>
+                        <ArrowClockwiseIcon data-icon="inline-start" />
+                        Retry
+                      </Button>
+                    </div>
+                  )}
                   <SliderField id="range-logo-size" label="Logo scale" valueLabel={`${Math.round(style.logoScale * 100)}%`} min={5} max={45} step={5} value={Math.round(style.logoScale * 100)} onChange={(v) => set('logoScale', v / 100)} />
                   <SwitchField id="toggle-logo-bg" label="Protective margin behind the logo" checked={style.logoMargin} onChange={(v) => set('logoMargin', v)} />
                 </div>

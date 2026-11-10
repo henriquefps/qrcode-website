@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { ContentInputs, ContentTypeTabs } from './ContentInputs';
 import { LivePreview } from './LivePreview';
 import { StylingPanel } from './StylingPanel';
-import { PRESET_LOGOS } from './logos';
+import { SUGGESTED_ICON } from '@/lib/logoIcons';
+import { useIconLogo } from './useIconLogo';
 import { Separator } from '@/components/ui/separator';
 import { DEFAULT_STYLE, parsePresetText, toPreset, type StyleConfig } from '@/lib/preset';
 import { EMPTY_FORM, getQRDataString, validateForm, type ContentType, type FormValues } from '@/lib/qrData';
@@ -28,13 +29,11 @@ const TYPE_LABELS: Record<ContentType, string> = {
   otp: '2FA (OTP)',
 };
 
-/** Logo suggested for a content type; replaces only none or another suggestion, never a user's choice. */
-const SUGGESTED_LOGO: Partial<Record<ContentType, 'wifi' | 'email' | 'web' | 'whatsapp'>> = { wifi: 'wifi', email: 'email', url: 'web', whatsapp: 'whatsapp' };
-
 export function CreateView() {
   const [type, setType] = useState<ContentType>('url');
   const [values, setValues] = useState<FormValues>(EMPTY_FORM);
   const [style, setStyle] = useState<StyleConfig>(DEFAULT_STYLE);
+  const iconLogo = useIconLogo(style, setStyle);
 
   const setValue = <K extends keyof FormValues>(key: K, value: FormValues[K]) => setValues((prev) => ({ ...prev, [key]: value }));
 
@@ -45,12 +44,13 @@ export function CreateView() {
   const changeType = (next: ContentType) => {
     setType(next);
     setStyle((prev) => {
-      const suggestion = SUGGESTED_LOGO[next];
-      if (!suggestion || prev.logoPreset === suggestion) return prev;
-      const wasSuggested = prev.logoPreset === 'wifi' || prev.logoPreset === 'email' || prev.logoPreset === 'web' || prev.logoPreset === 'whatsapp';
+      const suggestion = SUGGESTED_ICON[next as keyof typeof SUGGESTED_ICON];
+      if (!suggestion || (prev.logoPreset === 'icon' && prev.logoIcon === suggestion)) return prev;
+      // Replaces none (for Wi-Fi and WhatsApp) or another suggestion, never a user's own choice.
+      const wasSuggested = prev.logoPreset === 'icon' && (Object.values(SUGGESTED_ICON) as string[]).includes(prev.logoIcon);
       const replaceable = wasSuggested || (prev.logoPreset === 'none' && (next === 'wifi' || next === 'whatsapp'));
       if (!replaceable) return prev;
-      return { ...prev, logoPreset: suggestion, logoFile: PRESET_LOGOS[suggestion], logoFilename: `${suggestion}-logo`, ecLevel: 'H' };
+      return { ...prev, logoPreset: 'icon', logoIcon: suggestion, logoFile: '', logoFilename: suggestion.replace(':', '-'), ecLevel: 'H' };
     });
   };
 
@@ -62,7 +62,7 @@ export function CreateView() {
   };
 
   const importPreset = (text: string) => {
-    const result = parsePresetText(text, PRESET_LOGOS);
+    const result = parsePresetText(text);
     if (result.ok) {
       setStyle(result.style);
       toast.success('Style preset imported.');
@@ -99,7 +99,7 @@ export function CreateView() {
           <ContentInputs type={type} values={values} errors={errors} onChange={setValue} />
         </section>
         <Separator />
-        <StylingPanel style={style} setStyle={setStyle} onExport={exportPreset} onImport={importPreset} />
+        <StylingPanel style={style} setStyle={setStyle} onExport={exportPreset} onImport={importPreset} iconStatus={iconLogo.status} onRetryIcon={iconLogo.retry} />
       </div>
       {batchMounted && (
         <Suspense fallback={null}>

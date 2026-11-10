@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' data: blob:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' data: blob: https://api.iconify.design; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'
   Permissions-Policy: camera=(self), display-capture=(self), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), hid=(), midi=(), accelerometer=(), gyroscope=(), magnetometer=(), clipboard-read=(self), interest-cohort=()
   Referrer-Policy: no-referrer
   X-Content-Type-Options: nosniff

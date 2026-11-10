@@ -9,7 +9,7 @@ Live at <https://qrcode.hfps.dev> (formerly QRGo).
 
 ## Features
 
-- **Create**: URL, text, Wi-Fi, email, SMS, phone, WhatsApp, vCard, calendar event, location and 2FA (otpauth) codes. Dot, corner, color, gradient and logo styling, with style presets (JSON export and import). A live scannability check decodes the styled code and flags low contrast, big logos and a thin quiet zone. Download PNG (256, 512 or 1024 px) or SVG, or batch-create up to 1,000 codes from pasted rows or a CSV into a ZIP.
+- **Create**: URL, text, Wi-Fi, email, SMS, phone, WhatsApp, vCard, calendar event, location and 2FA (otpauth) codes. Dot, corner, color, gradient and logo styling (15 ready-made icons, a search over every open-licensed [Iconify](https://iconify.design/) collection, or your own image), with style presets (JSON export and import). A live scannability check decodes the styled code and flags low contrast, big logos and a thin quiet zone. Download PNG (256, 512 or 1024 px) or SVG, or batch-create up to 1,000 codes from pasted rows or a CSV into a ZIP.
 - **Read**: scan with a camera (device picker, mirror, torch), share a window or screen (desktop), open an image, drop one on the page or paste a screenshot. Wi-Fi, vCard/MeCard, `mailto:`, SMS, `tel:`, `geo:`, `otpauth://` and links are parsed, with an action for each (save contact, call, open in maps, compose email or SMS, copy password); 2FA codes show the current one-time code. Passwords and OTP secrets are masked until you reveal them, and a copied secret is cleared from the clipboard after 30 seconds. Links are never opened automatically.
 - **Quick show**: press `Q` (or use the header button), paste a password or link and get a huge black-on-white code that a phone camera reads from across a desk. Masked input, the screen stays on, and it closes itself after 60 seconds (add time or pause); `Esc` closes it at once. Either way the text is cleared. Built for moving a secret between a computer and a phone that share no network.
 - **Installable and offline**: a PWA. Share a screenshot to it or open an image with it to read the code; shortcuts for Read and Quick show. On browsers without `BarcodeDetector` the scanner fallback is downloaded in the background, so reading also works offline.
@@ -23,7 +23,7 @@ Live at <https://qrcode.hfps.dev> (formerly QRGo).
 
 ## Privacy
 
-Codes are drawn and decoded in your browser. What you type, scan, paste or upload is never sent to a server and never stored: there is no history. No account, no analytics, no cookies. The only thing saved in the browser is your theme and palette choice (`localStorage`: `qrcode.theme`, `qrcode.palette`). The clipboard is written only when you press Copy, and a copied secret (password, 2FA secret or code) is overwritten with an empty string after 30 seconds.
+Codes are drawn and decoded in your browser. What you type, scan, paste or upload is never sent to a server and never stored: there is no history. The only requests to another server go to the [Iconify API](https://iconify.design/docs/api/) (`api.iconify.design`), and only when you open the Logo section to browse or pick an icon; they carry the icon names or your search words, never the content of your code. A chosen icon is kept in the style as an image, so the code keeps rendering offline. No account, no analytics, no cookies. The only thing saved in the browser is your theme and palette choice (`localStorage`: `qrcode.theme`, `qrcode.palette`). The clipboard is written only when you press Copy, and a copied secret (password, 2FA secret or code) is overwritten with an empty string after 30 seconds.
 
 ## Stack
 
@@ -57,7 +57,10 @@ Copyright (C) Henrique Silva. Qrcode is free software under the **GNU Affero Gen
 | [barcode-detector](https://github.com/Sec-ant/barcode-detector) | MIT |
 | [zxing-wasm](https://github.com/Sec-ant/zxing-wasm) | MIT |
 | [ZXing-C++](https://github.com/zxing-cpp/zxing-cpp), compiled into the zxing-wasm binary | Apache-2.0 |
-| [Phosphor Icons](https://github.com/phosphor-icons/homepage) | MIT |
+| [Phosphor Icons](https://github.com/phosphor-icons/homepage) (the app's interface icons) | MIT |
+| [Lucide](https://lucide.dev/) icons (Wi-Fi, globe, email, phone, message, location, calendar and contact in the logo picker), loaded from Iconify when chosen | ISC |
+| [Simple Icons](https://simpleicons.org/) (WhatsApp, Instagram, GitHub, Facebook, LinkedIn, YouTube and Telegram in the logo picker), loaded from Iconify when chosen. The brand marks belong to their owners. | CC0 1.0 |
+| Any other logo icon found through the search | The license of its [Iconify](https://iconify.design/) collection. The app lists open licenses only and shows the collection, author and license next to the selected icon; some (for example CC BY) require crediting the author when you publish the code. |
 | [Inter](https://rsms.me/inter/) (via `@fontsource-variable/inter`) | SIL Open Font License 1.1 |
 
 The same list is shown in the app's About dialog.

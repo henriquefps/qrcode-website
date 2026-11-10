@@ -22,11 +22,15 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
 const PRIVACY = [
   ['No account', 'Open the page and use it. There is nothing to sign up for.'],
   ['Nothing leaves your device', 'Codes are drawn and read in your browser. What you type, scan or upload is never sent to a server and never stored.'],
+  ['Icon browsing', 'The only requests to another server go to the Iconify API, when you open the Logo section to browse or pick an icon. They carry icon names or your search words, never your code content.'],
   ['No tracking', 'No analytics, no cookies and no ads. The only thing saved in this browser is your theme and palette choice.'],
 ] as const;
 
 const CREDITS = [
   ['Phosphor icons', 'MIT license', 'https://github.com/phosphor-icons/homepage/blob/master/LICENSE'],
+  ['Lucide icons (logo picker)', 'ISC license', 'https://github.com/lucide-icons/lucide/blob/main/LICENSE'],
+  ['Simple Icons (logo picker; brand marks belong to their owners)', 'CC0 1.0', 'https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md'],
+  ['Other logo icons from Iconify', 'each collection\'s own license, shown next to the selected icon', 'https://iconify.design/'],
   ['Inter', 'SIL Open Font License 1.1', 'https://openfontlicense.org/'],
   ['qr-code-styling', 'MIT license', 'https://github.com/kozakdenys/qr-code-styling'],
   ['zxing-wasm and barcode-detector (camera fallback)', 'MIT license', 'https://github.com/Sec-ant/zxing-wasm'],
