@@ -6,6 +6,10 @@ const TYPES = ['URL', 'Text', 'Wi-Fi', 'Email', 'SMS', 'Phone', 'WhatsApp', 'vCa
 
 const status = (page: import('@playwright/test').Page) => page.getByRole('status').filter({ hasText: /Scannable|May not scan|Checking|Not checked/ });
 
+// The Iconify mocks (page.route) cannot see requests made by the service worker, which takes control of a fresh page
+// within a moment and would send them to the real API. server.spec.ts covers the service worker itself.
+test.use({ serviceWorkers: 'block' });
+
 test.describe('Create', () => {
   for (const name of TYPES) {
     test(`${name}: renders and the default code is scannable`, async ({ page }) => {
