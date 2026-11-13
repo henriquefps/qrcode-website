@@ -22,7 +22,7 @@ English only (see docs/adr/0002).
 
 Vite + React 19 + TypeScript (strict) + Tailwind v4 + shadcn/ui **`radix-vega`** (replace the old base-ui `base-sera` components),
 Inter, Phosphor icons, `qr-code-styling`, Vitest + Testing Library where useful. Package manager **bun**.
-UI follows the `hfps-app-ui` skill. **Default theme: palette `blue`, mode `light`** (NOT olive). Light / Dark / System and a
+UI follows the `hfps-kit` skill (`react/GUIDE.md`). **Default theme: palette `blue`, mode `light`** (NOT olive). Light / Dark / System and a
 palette menu stay available; storage keys `qrcode.theme`, `qrcode.palette`. Radius 0.75rem.
 Remove `html5-qrcode`, `wrangler`, `next-themes` if unused, `package-lock.json`, `jsconfig.json`.
 **`node_modules/` and `dist/` are currently tracked in git: `git rm -r --cached` them** (already in .gitignore).
@@ -92,7 +92,7 @@ contrast, logo size and quiet zone). **Batch**: up to 1,000 rows (lines or CSV w
 
 ## Brand & PWA
 
-New Qrcode icon (`hfps-repo-assets` skill): icon.svg, icon-light.svg, icon.png, favicon.ico, apple-touch-icon, 192/512 + maskable, 2560x1280 social image, `og.png` for OG/Twitter.
+New Qrcode icon (`hfps-kit` skill (`repo-assets/GUIDE.md`)): icon.svg, icon-light.svg, icon.png, favicon.ico, apple-touch-icon, 192/512 + maskable, 2560x1280 social image, `og.png` for OG/Twitter.
 `index.html` with full SEO/OG/Twitter/JSON-LD for `https://qrcode.hfps.dev/`, `robots.txt`, `sitemap.xml`, `manifest.webmanifest`.
 PWA via `vite-plugin-pwa` (**injectManifest**, autoUpdate; own service worker `src/pwa/sw.ts` with Workbox precache, runtime caches and the share-target POST
 handler; `registerSW.js` is injected deferred), offline works; precache small (the WASM fallback, `jszip` and non-Latin fonts are runtime-cached). The old custom `public/sw.js` is removed.
